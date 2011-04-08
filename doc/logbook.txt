@@ -1,0 +1,17 @@
+2010/12/03 friday - 2:00u
+Got the Parrot ARdrone in my hands for the first time.
+Starting up by plugging in the battery. Has wifi network (ssid=ardrone_078849)
+without encryption. Connected, has:
+- ftp (anonymous rw permissions in /data/video/) on 21
+- telnet on 20
+Has linux with busybox, some scripts available, searching for control scripts..
+
+site [official]: http://www.parrot.com/fr/support/guidesutilisateur/ar.drone_user-guide_uk.pdf
+site [hack]: http://www.kapejod.org/2010/08/parrot-ar-drone-linux-internals/
+site [hack]: https://projects.ardrone.org/boards/1/topics/show/852
+
+Using java program ARDrone i could send AT signals to port 5556. After starting
+program.elf while in directory /data/video, things happen and sending a signal
+gives some message. New version accepts function keys (PgUp starts flying, arrows
+for navigating). It seems as if the ARDrone flies back if you push him to another
+place in the room.
