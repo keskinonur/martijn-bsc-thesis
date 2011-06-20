@@ -61,3 +61,12 @@ TODO: finish USARSim install for lin native and lin wine::
         wine /home/martijn/.wine/drive_c/UT2004/System/UCC.exe make -ini=USARSim.ini
 
 
+
+TODO: hier analoge logboek overnemen
+
+
+done this:
+http://www.samontab.com/web/2011/06/installing-opencv-2-2-in-ubuntu-11-04/
+https://code.ros.org/trac/opencv/changeset/5206
+sudo apt-get install libhighgui2.1 libhighgui-dev
+

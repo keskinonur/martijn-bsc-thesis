@@ -1,0 +1,20 @@
+Run ./../../Sources/UI/steuerung with root access
+Run ./keyboardcontrol with root access
+Keep the GTK widget under focus
+Use any of the following commands:
+
+space = take off/landing
+p = Switch to record mode (only works one time so use it wisely ;) )
+= = Increase speed
+- = decrease speed
+
+w = fly up
+s = fly down
+a = turn left
+d = turn right
+
+arrows:
+up = fly forward
+down = fly backwards
+left = strafe left
+right = strafe right
