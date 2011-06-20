@@ -1,4 +1,5 @@
 2010/12/03 friday - 2:00u
+=========================
 Got the Parrot ARdrone in my hands for the first time.
 Starting up by plugging in the battery. Has wifi network (ssid=ardrone_078849)
 without encryption. Connected, has:
@@ -15,3 +16,48 @@ program.elf while in directory /data/video, things happen and sending a signal
 gives some message. New version accepts function keys (PgUp starts flying, arrows
 for navigating). It seems as if the ARDrone flies back if you push him to another
 place in the room.
+
+
+2011
+=========================
+- Some exercises
+- read some papers
+- some meetings with arnoud and matthijs
+(- finished courses)
+
+
+2011/06/08
+=========================
+* Started logbook again.
+
+* Searching for better wiki and blog with reStructuredText support
+  Trac - http://trac.edgewall.org/wiki/WikiRestructuredText
+  MoinMoin - http://moinmo.in/HelpOnParsers/ReStructuredText
+  MediaWiki - http://www.mediawiki.org/wiki/Extension%3aRstToHtml
+  Wordpress - http://xdissent.com/projects/wordprest/
+
+* Reading Nicks blog
+  http://nickd.nl/wiki/thesis
+  Reading Robrechts blog
+  http://opticalflow.wikkii.com/wiki/Log
+
+
+2011/06/09
+=========================
+* Installed Unreal2004 in Linux (native)
+  Runs OK.
+* Installed Unreal2004 in Linux, Windows version (wine) for UnrealEd
+  Unreal runs OK.
+  UnrealEd seems to work not very well, some graphics problems.
+
+TODO: finish USARSim install for lin native and lin wine::
+
+        lin win wine:
+        /home/martijn/.wine/drive_c/UT2004/System
+        wine ucc make -ini=USARSim.ini
+
+        lin native:
+        /usr/local/games/ut2004/System
+        wine /home/martijn/.wine/drive_c/UT2004/System/UCC.exe make -ini=USARSim.ini
+
+
