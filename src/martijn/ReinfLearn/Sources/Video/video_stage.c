@@ -67,7 +67,7 @@ C_RESULT output_gtk_stage_open( void *cfg, vp_api_io_data_t *in, vp_api_io_data_
   /* set header for QVGA image ((must be QCIF for front cam)*/
   rgbHeader = cvCreateImageHeader(cvSize(QVGA_WIDTH, QVGA_HEIGHT), IPL_DEPTH_8U, 3);
   rgbHeader->imageData = NULL;
-      /* Open window for image stream */
+  /* Open window for image stream */
   PRINT("\n Opening window for image stream!");
   cvStartWindowThread();
   cvNamedWindow(WINDOW_STREAM_FRONT, CV_WINDOW_AUTOSIZE);
