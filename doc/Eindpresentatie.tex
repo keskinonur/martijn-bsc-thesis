@@ -1,0 +1,120 @@
+\documentclass[10pt]{beamer} 
+%\setbeamerfont{smaller}{size=\tiny } 
+%\usepackage[latin1]{inputenc} 
+%\usepackage{verbatim}  
+% \usepackage{graphicx} 
+%\usepackage{multicolumn}
+
+\usepackage{wrapfig}
+%\usepackage{grahicx} 
+\usetheme{Hannover} % Marburg, Berkeley, Berlin, Singapore 
+\title{Optimizing paths in figure-8 task using reinforcement learning} 
+\subtitle{\small Supervisor: Arnoud Visser} 
+\author{Martijn van der Veen} 
+\institute{University of Amsterdam} 
+
+% \begin{block}{Block title} \begin{alertblock}{Alert-block title} \begin{exampleblock}{Example-block title}
+
+% Color text for slide \colortxt{slide}{color}{text}
+\newcommand{\colortxt}[3]{\only<#1>{\textcolor{#2}}{#3}}
+
+\begin{document}
+
+\begin{frame}
+\begin{center}
+
+%\includegraphics[height=2cm]{}%uva}
+
+\end{center}
+\titlepage
+\end{frame}
+
+% \begin{comment}
+% % Uncover example
+% Test\\
+% \uncover<2-3>{Korte tekst tussendoor}
+% \uncover<4->{Test2}
+% ook leuk:
+% \only<2>{}
+% Dit toont iets op alleen 1 slide
+% Je kan ook \pause gebruiken
+% 
+% MultiColumn output
+% %\begin{columns}[l]
+% %\column{1.5in}
+% %\column{1.5in}
+% %\end{columns}
+% \end{comment}
+
+\begin{frame}
+\tableofcontents
+\end{frame}
+
+\section{Goal}
+\begin{frame}
+ \frametitle{Goal}
+ Learn path of figure-8 challenge using reinforcement learning for aerial robot.
+ TODO: plaatje imav
+\end{frame}
+
+\begin{frame}
+ \frametitle{Why?}
+ \begin{itemize}
+   \item Frequently used for testing (real) robots
+   \item Task suitable for Reinforcement Learning
+   \item Autonomous aerial systems are useful
+   \begin{itemize}
+     \item Locations humans / ground robots cannot reach
+     \item Nice overview
+     \item Price is dropping
+   \end{itemize}
+ \end{itemize}
+\end{frame}
+
+\section{Related Work}
+\begin{frame}
+ \frametitle{Related Work}
+ \begin{itemize}
+   \item Figure-8 mostly used for ground robots
+   \item Often using SLAM
+ \end{itemize}
+\end{frame}
+
+\section{Approach}
+\begin{frame}
+ TODO: aparte slides met plaatjes
+ \begin{itemize}
+   \item Train in simulation, use in real life
+   \begin{itemize}
+     \item Unreal Tournament 2004 + USARSim
+     \item AR.Drone ported to Unreal by Nick Dijkshoorn
+   \end{itemize}
+   \item Set initial force field
+   \item Use different stages (crossed path)
+ \end{itemize}
+\end{frame}
+
+\section{Results}
+\begin{frame}
+\end{frame}
+
+\section{Future Research}
+\begin{frame}
+ - localisatie: features of kaart?
+ - imav
+\end{frame}
+
+\section{Summary}
+\begin{frame}
+\begin{block}{Questions?}
+\begin{itemize}
+  \item 
+
+\end{itemize}
+\end{block}
+\end{frame}
+
+
+
+\end{document}
+

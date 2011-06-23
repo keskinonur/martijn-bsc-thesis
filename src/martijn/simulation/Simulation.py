@@ -175,6 +175,9 @@ class Simulation:
     else:
       return ( float(vect[0]) / norm, float(vect[1]) / norm )
 
+  def dot(self, vect1, vect2):
+    return vect1[0] * vect2[0] + vect1[1] * vect2[1]
+
   def add(self, vect1, vect2):
     return (vect1[0] + vect2[0], vect1[1] + vect2[1])
 

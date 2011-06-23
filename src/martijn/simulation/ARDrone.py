@@ -44,6 +44,8 @@ class ARDrone:
     # TODO: make more realistici decay
     self.speed = (vx + timestep*fx - timestep*decay * vx*vx*vx, \
                   vy + timestep*fy - timestep*decay * vy*vy*vy)
+    # for fun: set angle
+    self.theta = math.acos(self.simulation.dot(self.simulation.unit(self.speed), (1, 0)))
     print self.speed
     print "with force " + str((fx, fy))
     
