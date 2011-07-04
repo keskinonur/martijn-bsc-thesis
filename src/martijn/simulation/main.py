@@ -17,11 +17,17 @@ def discrete(width, height, course, spawn):
   sim.add_object('circle', 0, (255, 50, 0), (1*int(center[0]/2), center[1]), int(center[1]/40))
   sim.add_object('circle', 0, (255, 50, 0), (3*int(center[0]/2), center[1]), int(center[1]/40))
   # add forcefields for objects
+  sim.show()
+  raw_input()
   sim.add_object_forcefields(150, 20)
+  sim.show()
+  raw_input()
+  sim.add_rounded_forcefield((600,300), int(center[1]/40), 300, 30, 90)
+  sim.add_rounded_forcefield((200,300), int(center[1]/40), 300, 30, -90)
   
   # draw
   timestep  = 0.5
-  sleepstep = 0.01
+  sleepstep = 0.001
   while True:
     sim.show()
     #sim.ardrone.theta += math.radians(5)

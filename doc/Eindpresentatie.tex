@@ -1,8 +1,8 @@
 \documentclass[10pt]{beamer} 
 %\setbeamerfont{smaller}{size=\tiny } 
 %\usepackage[latin1]{inputenc} 
-%\usepackage{verbatim}  
-% \usepackage{graphicx} 
+\usepackage{verbatim}  
+ \usepackage{graphicx} 
 %\usepackage{multicolumn}
 
 \usepackage{wrapfig}
@@ -54,7 +54,9 @@
 \begin{frame}
  \frametitle{Goal}
  Learn path of figure-8 challenge using reinforcement learning for aerial robot.
- TODO: plaatje imav
+ \begin{figure}
+  \includegraphics[width=0.8\textwidth]{img/imav2011_pylon}
+ \end{figure}
 \end{frame}
 
 \begin{frame}
@@ -77,40 +79,115 @@
  \begin{itemize}
    \item Figure-8 mostly used for ground robots
    \item Often using SLAM
+   \item Not much 'learning'
  \end{itemize}
 \end{frame}
 
 \section{Approach}
 \begin{frame}
- TODO: aparte slides met plaatjes
  \begin{itemize}
+   \frametitle{Approach}
    \item Train in simulation, use in real life
    \begin{itemize}
      \item Unreal Tournament 2004 + USARSim
      \item AR.Drone ported to Unreal by Nick Dijkshoorn
    \end{itemize}
-   \item Set initial force field
-   \item Use different stages (crossed path)
+ \begin{figure}
+  \includegraphics[width=0.3\textwidth]{img/ARDRONE}
+ \end{figure}
+ \begin{figure}
+  \includegraphics[width=0.3\textwidth]{img/ardrone_sim}
+ \end{figure}
  \end{itemize}
+\end{frame}
+
+\begin{frame}
+ \begin{itemize}
+   \frametitle{Approach}
+   \item Train in simulation, use in real life
+   \begin{itemize}
+     \item Unreal Tournament 2004 + USARSim
+     \item AR.Drone ported to Unreal by Nick Dijkshoorn
+   \end{itemize}
+ \begin{figure}
+  \includegraphics[width=0.7\textwidth]{img/ardrone_real_sim}
+ \end{figure}
+ \end{itemize}
+\end{frame}
+
+\begin{frame}
+ \begin{itemize}
+   \item Train in simulation, use in real life
+   \begin{itemize}
+     \item Unreal Tournament 2004 + USARSim
+     \item AR.Drone ported to Unreal by Nick Dijkshoorn
+     \item Switch between simulation and real life
+   \end{itemize}
+   \item Learn 'Force Field'
+   \pause
+   \item Set initial force field
+   \pause
+   \item Use different stages / force fields (crossed path)
+   \pause
+   \item Use reinforcement learning
+ \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \begin{itemize}
+   \item No states but forces
+   \begin{figure}
+    \includegraphics[width=0.1\textwidth]{img/rl_force}
+   \end{figure}
+   \item Rewards: +10 for field transision, -10 for hitting
+   \begin{figure}
+    \includegraphics[width=0.2\textwidth]{img/rl_rewards}
+   \end{figure}
+   \item Value iteration: each vector has (extra) return value
+   \item Updates:
+   \begin{itemize}
+    \item vector addition
+    \item update last X vectors
+    \item scale: value difference, last seen, normalize
+   \end{itemize}
+   \begin{figure}
+    \includegraphics[width=0.1\textwidth]{img/rl_add}
+   \end{figure}
+  \end{itemize}
 \end{frame}
 
 \section{Results}
 \begin{frame}
+ \frametitle{Results}
+ Force fields
+ \begin{figure}
+  \includegraphics[width=0.7\textwidth]{img/force_fields}
+ \end{figure}
+\end{frame}
+
+\begin{frame}
+ \frametitle{Results}
+ \begin{itemize}
+  \item Level in unreal
+  \item Writing code for Unreal
+ \end{itemize}
+ \begin{figure}
+  \includegraphics[width=0.7\textwidth]{img/unreal_pylonlevel}
+ \end{figure}
 \end{frame}
 
 \section{Future Research}
 \begin{frame}
- - localisatie: features of kaart?
- - imav
+ \frametitle{Future Research}
+ \begin{itemize}
+  \item lokalisatie (image matching, optical flow, RatSlam)
+  \item IMAV2011 optimization (better level, etc)
+ \end{itemize}
 \end{frame}
 
 \section{Summary}
 \begin{frame}
 \begin{block}{Questions?}
-\begin{itemize}
-  \item 
-
-\end{itemize}
 \end{block}
 \end{frame}
 

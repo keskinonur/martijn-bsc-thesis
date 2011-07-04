@@ -95,6 +95,22 @@ class Simulation:
             vect_new = self.add(vect, vect_force)
             self.particles[i] = (x, y, vect_new, val)
           
+  def add_rounded_forcefield(self, loc, r, radius, strength, angle):
+    coord1 = loc
+    coord2 = r
+    # search for particles within radius
+    for i in range(len(self.particles)):
+      x, y, vect, val = self.particles[i]
+      if self.dist((x, y), coord1) - coord2 < radius:
+        scal_force = strength * self.fdv(self.dist((x, y), \
+                     coord1), (radius - coord2))
+        vect_force = self.unit(self.rot(self.diff((x,y), coord1), angle))
+        vect_force = (vect_force[0]*scal_force, \
+                      vect_force[1]*scal_force)
+        vect_new = self.add(vect, vect_force)
+        self.particles[i] = (x, y, vect_new, val)
+        
+
 
   ## 'getters'
 
@@ -188,6 +204,10 @@ class Simulation:
     return math.sqrt(math.pow(vect1[0] - vect2[0], 2) + \
                      math.pow(vect1[1] - vect2[1], 2))
 
+  def rot(self, vect, angle):
+    angle = math.radians(angle)
+    return (math.cos(angle)*vect[0] - math.sin(angle)*vect[1], \
+            math.sin(angle)*vect[0] + math.cos(angle)*vect[1])
 
 
 

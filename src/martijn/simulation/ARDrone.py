@@ -22,10 +22,10 @@ class ARDrone:
     x, y = self.location
     xdiff = int(rc * math.cos(self.theta + math.radians(45)))
     ydiff = int(rc * math.sin(self.theta + math.radians(45)))
-    c = [(x + xdiff, y + ydiff),
-         (x - ydiff, y + xdiff),
-         (x + ydiff, y - xdiff),
-         (x - xdiff, y - ydiff)]
+    c = [(int(x + xdiff), int(y + ydiff)),
+         (int(x - ydiff), int(y + xdiff)),
+         (int(x + ydiff), int(y - xdiff)),
+         (int(x - xdiff), int(y - ydiff))]
     l_start = (x + int(r * math.cos(-1*self.theta)), \
                y - int(r * math.sin(-1*self.theta)))
     l_stop  = (x - 2*int(r * math.cos(-1*self.theta)), \

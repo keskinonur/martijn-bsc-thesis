@@ -1,17 +1,11 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2011.5.22)  23 JUN 2011 02:36
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2011.5.25)  23 JUN 2011 12:41
 entering extended mode
  %&-line parsing enabled.
 **Eindpresentatie.tex
 (./Eindpresentatie.tex
 LaTeX2e <2009/09/24>
 Babel <v3.8l> and hyphenation patterns for english, usenglishmax, dumylang, noh
-yphenation, farsi, arabic, croatian, bulgarian, ukrainian, russian, czech, slov
-ak, danish, dutch, finnish, french, basque, ngerman, german, german-x-2009-06-1
-9, ngerman-x-2009-06-19, ibycus, monogreek, greek, ancientgreek, hungarian, san
-skrit, italian, latin, latvian, lithuanian, mongolian2a, mongolian, bokmal, nyn
-orsk, romanian, irish, coptic, serbian, turkish, welsh, esperanto, uppersorbian
-, estonian, indonesian, interlingua, icelandic, kurmanji, slovenian, polish, po
-rtuguese, spanish, galician, catalan, swedish, ukenglish, pinyin, loaded.
+yphenation, loaded.
 (/usr/share/texmf/tex/latex/beamer/base/beamer.cls
 (/usr/share/texmf/tex/latex/beamer/base/beamerbasercs.sty
 Package: beamerbasercs 2007/01/28 (rcs-revision 1.4)
@@ -302,8 +296,7 @@ Package ifvtex Info: VTeX not detected.
 \Gm@odd@mp=\dimen155
 \Gm@even@mp=\dimen156
 \Gm@dimlist=\toks20
-
-(/usr/share/texmf-texlive/tex/xelatex/xetexconfig/geometry.cfg))
+)
 (/usr/share/texmf-texlive/tex/latex/hyperref/hyperref.sty
 Package: hyperref 2009/10/09 v6.79a Hypertext links for LaTeX
 
@@ -622,12 +615,18 @@ Package: beamerinnerthemedefault 2007/01/28  (rcs-revision 1.20)
 (/usr/share/texmf/tex/latex/beamer/themes/outer/beamerouterthemedefault.sty
 Package: beamerouterthemedefault 2007/01/28  (rcs-revision 1.14)
 )))
+(/usr/share/texmf-texlive/tex/latex/tools/verbatim.sty
+Package: verbatim 2003/08/22 v1.5q LaTeX2e package for verbatim enhancements
+\every@verbatim=\toks38
+\verbatim@line=\toks39
+\verbatim@in@stream=\read1
+)
 (/usr/share/texmf-texlive/tex/latex/wrapfig/wrapfig.sty
 \wrapoverhang=\dimen178
 \WF@size=\dimen179
 \c@WF@wrappedlines=\count150
 \WF@box=\box52
-\WF@everypar=\toks38
+\WF@everypar=\toks40
 Package: wrapfig 2003/01/31  v 3.6
 )
 (/usr/share/texmf/tex/latex/beamer/themes/theme/beamerthemeHannover.sty
@@ -661,18 +660,19 @@ LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 21.
 LaTeX Font Info:    ... okay on input line 21.
 LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 21.
 LaTeX Font Info:    ... okay on input line 21.
- (/usr/share/texmf/tex/context/base/supp-pdf.mkii
+
+(/usr/share/texmf-texlive/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count151
 \scratchdimen=\dimen182
 \scratchbox=\box53
 \nofMPsegments=\count152
 \nofMParguments=\count153
-\everyMPshowfont=\toks39
+\everyMPshowfont=\toks41
 \MPscratchCnt=\count154
 \MPscratchDim=\dimen183
 \MPnumerator=\count155
-\everyMPtoPDFconversion=\toks40
+\everyMPtoPDFconversion=\toks42
 )
 *geometry auto-detecting driver*
 *geometry detected driver: pdftex*
@@ -788,29 +788,78 @@ LaTeX Font Warning: Font shape `OT1/cmss/m/n' in size <4> not available
 ] (./Eindpresentatie.toc)
 [2
 
-] [3
+] <img/imav2011_pylon.png, id=115, 860.21375pt x 408.52625pt>
+File: img/imav2011_pylon.png Graphic file (type png)
 
-]
-LaTeX Font Info:    Try loading font information for OMS+cmss on input line 64.
+<use img/imav2011_pylon.png> [3
 
-LaTeX Font Info:    No file OMScmss.fd. on input line 64.
+ <./img/imav2011_pylon.png>]
+LaTeX Font Info:    Try loading font information for OMS+cmss on input line 74.
+
+LaTeX Font Info:    No file OMScmss.fd. on input line 74.
 
 
 LaTeX Font Warning: Font shape `OMS/cmss/m/n' undefined
 (Font)              using `OMS/cmsy/m/n' instead
-(Font)              for symbol `textbullet' on input line 64.
+(Font)              for symbol `textbullet' on input line 74.
 
 [4
 
 ] [5
 
-] [6
+] <img/ARDRONE.jpg, id=214, 803.0pt x 677.53125pt>
+File: img/ARDRONE.jpg Graphic file (type jpg)
+ <use img/ARDRONE.jpg>
+<img/ardrone_sim.png, id=215, 496.85625pt x 406.51875pt>
+File: img/ardrone_sim.png Graphic file (type png)
 
-] [7
+<use img/ardrone_sim.png> [6
 
-] [8
+ <./img/ARDRONE.jpg> <./img/ardrone_sim.png>]
+<img/ardrone_real_sim.png, id=250, 412.54124pt x 406.51875pt>
+File: img/ardrone_real_sim.png Graphic file (type png)
+
+<use img/ardrone_real_sim.png>
+Overfull \vbox (4.24619pt too high) detected at line 116
+ []
+
+[7
+
+ <./img/ardrone_real_sim.png>] [8
 
 ] [9
+
+] [10
+
+] [11
+
+]
+<img/rl_force.png, id=412, 100.375pt x 100.375pt>
+File: img/rl_force.png Graphic file (type png)
+ <use img/rl_force.png>
+<img/rl_rewards.png, id=413, 100.375pt x 100.375pt>
+File: img/rl_rewards.png Graphic file (type png)
+ <use img/rl_rewards.png>
+<img/rl_add.png, id=414, 100.375pt x 100.375pt>
+File: img/rl_add.png Graphic file (type png)
+ <use img/rl_add.png> [12
+
+ <./img/rl_force.png (PNG copy)> <./img/rl_rewards.png> <./img/rl_add.png (PNG 
+copy)>] <img/force_fields.png, id=447, 800.9925pt x 600.2425pt>
+File: img/force_fields.png Graphic file (type png)
+
+<use img/force_fields.png> [13
+
+ <./img/force_fields.png (PNG copy)>]
+<img/unreal_pylonlevel.png, id=481, 602.25pt x 447.92343pt>
+File: img/unreal_pylonlevel.png Graphic file (type png)
+
+<use img/unreal_pylonlevel.png> [14
+
+ <./img/unreal_pylonlevel.png (PNG copy)>]
+[15
+
+] [16
 
 ]
 \tf@nav=\write5
@@ -832,22 +881,22 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  ) 
 Here is how much of TeX's memory you used:
- 12768 strings out of 493848
- 226863 string characters out of 1152823
- 309112 words of memory out of 3000000
- 15693 multiletter control sequences out of 15000+50000
+ 12863 strings out of 495061
+ 228407 string characters out of 1182621
+ 308223 words of memory out of 3000000
+ 15664 multiletter control sequences out of 15000+50000
  6276 words of font info for 23 fonts, out of 3000000 for 9000
- 714 hyphenation exceptions out of 8191
- 45i,15n,60p,323b,548s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 28 hyphenation exceptions out of 8191
+ 45i,15n,61p,344b,548s stack positions out of 5000i,500n,10000p,200000b,50000s
 </usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmss10.pfb></usr/sha
 re/texmf-texlive/fonts/type1/public/amsfonts/cm/cmss12.pfb></usr/share/texmf-te
 xlive/fonts/type1/public/amsfonts/cm/cmss8.pfb></usr/share/texmf-texlive/fonts/
 type1/public/amsfonts/cm/cmss9.pfb></usr/share/texmf-texlive/fonts/type1/public
 /amsfonts/cm/cmsy8.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm
 /cmsy9.pfb>
-Output written on Eindpresentatie.pdf (9 pages, 129440 bytes).
+Output written on Eindpresentatie.pdf (16 pages, 1321917 bytes).
 PDF statistics:
- 364 PDF objects out of 1000 (max. 8388607)
- 25 named destinations out of 1000 (max. 500000)
- 81 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 607 PDF objects out of 1000 (max. 8388607)
+ 39 named destinations out of 1000 (max. 500000)
+ 126 words of extra memory for PDF output out of 10000 (max. 10000000)
 
