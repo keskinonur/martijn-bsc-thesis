@@ -70,3 +70,10 @@ http://www.samontab.com/web/2011/06/installing-opencv-2-2-in-ubuntu-11-04/
 https://code.ros.org/trac/opencv/changeset/5206
 sudo apt-get install libhighgui2.1 libhighgui-dev
 
+
+zoeken naar papers:
+* "figure 8's" OR "8-figures" -"8 Figures"
+* "force field" robotics
+* "AR.Drone"
+
+

@@ -8,4 +8,5 @@
 .*.blg
 .*.swp
 .*.mp4
+.*.pyc
 src/others/robrecht/Examples/Linux/ATest/Build/Release/Movies/
