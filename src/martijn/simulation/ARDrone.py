@@ -42,8 +42,9 @@ class ARDrone:
     x,  y  = self.location
     vx, vy = self.speed
     fx, fy = self.simulation.get_force(self.location)
+    # update location
     self.location = (x + timestep * vx, y + timestep * vy)
-    # TODO: make more realistici decay
+    # TODO: make more realistic decay
     self.speed = (vx + timestep*fx - timestep*decay * vx*vx*vx, \
                   vy + timestep*fy - timestep*decay * vy*vy*vy)
     # for fun: set angle
@@ -51,18 +52,27 @@ class ARDrone:
     #print self.speed
     #print "with force " + str((fx, fy))
 
+    # do reinforcement learning steps
+    self.simulation.reinf_learn( (x,y), (vx,vy) )
     # check for state transition
     self.simulation.check_for_state_transition(self.location, self.old_location)
     
   def explore(self, timestep, maximum):
+    self.old_location = self.location
     x,  y  = self.location
     vx, vy = self.speed
     fx, fy = self.simulation.get_force(self.location)
     vect_e = unit((0.5 - random.random(), 0.5 - random.random()))
     scal_e = random.random() * maximum
     ex, ey = (scal_e * vect_e[0], scal_e * vect_e[1])
+    # update location
     self.location = (x + timestep * vx, y + timestep * vy)
     self.speed = (vx + timestep*(fx + ex), vy + timestep*(fy + ey))
+
+    # do reinforcement learning steps
+    self.simulation.reinf_learn( (x,y), (vx,vy) )
+    # check for state transition
+    self.simulation.check_for_state_transition(self.location, self.old_location)
     
 
 
