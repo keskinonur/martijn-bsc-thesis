@@ -75,5 +75,6 @@ zoeken naar papers:
 * "figure 8's" OR "8-figures" -"8 Figures"
 * "force field" robotics
 * "AR.Drone"
+* force field navigation
 
 
