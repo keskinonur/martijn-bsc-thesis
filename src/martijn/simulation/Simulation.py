@@ -16,7 +16,7 @@ from ARDrone import *        # ARDrone object
 
 class Simulation:
 
-  def __init__(self, width, height, spawn):
+  def __init__(self, width, height, spawn, rl_history=10):
     pygame.init()
     self.width  = width
     self.height = height
@@ -25,22 +25,73 @@ class Simulation:
     self.stages = dict()  # for stages with particles each
     self.stage = None     # current stage (string)
     self.transitions = list() # transition edges
-    val = 1 # could be used for speed
     self.ardrone = ARDrone(spawn, self)
+    self.history = [None]*rl_history
 
 
 
   ## state functions
-  
+
   def check_for_state_transition(self, loc_new, loc_old):
-    print "TODO: check for state transition"
     for stage_from, stage_to, edge in self.transitions:
       if stage_from == self.stage:
         edge_type, coord1, coord2 = edge
         # check for crossing
-        if edge[0] == "line":
-          pass
+        if edge_type == "line":
+          a, c = coord1, coord2
+          b, d = loc_new, loc_old
+          #   a------b      a------b
+          #   |      |  or  |      |
+          #   d------c      c------d
+          #    (cross)     (no cross)
+          # check if cross product of (3D) vectors in ring order
+          # are all the same:
+          # (ad x ab) > 0 and (ba x bc) > 0 and (cb x cd) > 0 and (dc x da) > 0, OR:
+          # (ad x ab) < 0 and (ba x bc) < 0 and (cb x cd) < 0 and (dc x da) < 0
+          if sign(a, b, c) == sign(b, c, d) == sign(c, d, a) == sign(d, a, b):
+            self.stage = stage_to
+            print ">> Transition: " + stage_from + " -> " + stage_to
 
+
+  ## Reinforcement Learning
+
+  def reinf_learn(self, current_location, current_speed):
+    self.value_iteration()
+    self.update_particles(current_speed)
+    self.save_current_particle(current_location)
+
+  def value_iteration(self):
+    pass # TODO: implement value iteration (last vector)
+
+  # save nearest particle (for reinf learn)
+  def save_current_particle(self, loc):
+    x, y, vect, val = self.get_nearest_particle(loc)
+    stage = self.stage
+    if (x,y,stage) != self.history[0]:
+      # move older items
+      i = len(self.history) - 1
+      while i > 0:
+        self.history[i] = self.history[i-1]
+        i -= 1
+      # add current particle (and stage)
+      self.history[0] = (x,y,stage)
+
+  # update particles in history, based on reward and time since last visit
+  # TODO: use reward, value iteration and time last visit or so
+  def update_particles(self, current_speed):
+    alpha = 0.1
+    for i in range(len(self.history)):
+      if self.history[i] == None:
+        continue
+      x, y, stage = self.history[i]
+      ID = self.get_particle_id( (x,y), stage)
+      x, y, old_vect, old_val = self.stages[stage].particles[ID]
+      weight = alpha * (1 - (1.0 / len(self.history)) * (i+1))
+      new_vect = (weight*current_speed[0] + (1-weight)*old_vect[0], \
+                  weight*current_speed[1] + (1-weight)*old_vect[1])
+      new_val = old_val
+      self.stages[stage].particles[ID] = (x, y, new_vect, new_val)
+      
 
   ## 'setters'
 
@@ -176,6 +227,13 @@ class Simulation:
         distance = temp
     return nearest
 
+  def get_particle_id(self, loc, stage):
+    for i in range(len(self.stages[stage].particles)):
+      x, y, vect, val = self.stages[stage].particles[i]
+      if (x, y) == loc:
+        return i
+    return None
+
   def get_force(self, loc):
     # get force: now nearest neighbour
     # TODO: some interpolation
@@ -209,7 +267,10 @@ class Simulation:
       if self.stage == None:
         self.stage = self.stages.keys()[0]
       for x, y, vect, val in self.stages[self.stage].particles:
-        self.draw_vector(x, y, vect, (50, 50, 255))
+        if (x, y, self.stage) in self.history:
+          self.draw_vector(x, y, vect, (255, 50, 50))
+        else:
+          self.draw_vector(x, y, vect, (50, 50, 255))
     # show transitions
     for stage_from, stage_to, edge in self.transitions:
       if stage_from == self.stage:
