@@ -9,9 +9,9 @@ from header import *
 # course: size of one 'block' (size between vectors)
 # spawn: spawn location
 # speed: FPS, stepsize: nr of courses per round
-def discrete(width, height, course, spawn, speed=1000, stepsize=0.5):
+def discrete(width, height, course, spawn, rl_history, speed=1000, stepsize=0.5):
   # open window
-  sim = Simulation(width, height, spawn)
+  sim = Simulation(width, height, spawn, rl_history=rl_history)
   center = ( int(width / 2), int(height / 2) )
   # make border
   sim.add_object('wall', 'rect',   4, (255, 50, 0), (  3,   3), (width-9, height-9))
@@ -27,20 +27,14 @@ def discrete(width, height, course, spawn, speed=1000, stepsize=0.5):
   trans2 = ('line', (width-9, center[1]), (3*int(center[0]/2), center[1]))
   sim.add_stage_transition('right_to_left', 'left_to_right', trans1)
   sim.add_stage_transition('left_to_right', 'right_to_left', trans2)
-
-  sim.show()
-  raw_input()
   
   # add forcefields for objects
   #                         (r,   pwr)
   sim.add_object_forcefields('all', 150, 20 )
-
-  sim.show()
-  raw_input()
   
-  #                         ( name,         r,   pwr, ang)
-  sim.add_rounded_forcefield('all', 'pylon_left' , 300, 10,   90)
-  sim.add_rounded_forcefield('all', 'pylon_right', 300, 10,  -90)
+  #                         ( stage,   object name,   r,pwr, ang)
+  sim.add_rounded_forcefield('all' , 'pylon_left' , 300, 20,  90)
+  sim.add_rounded_forcefield('all' , 'pylon_right', 300, 20, -90)
   
   # draw
   while True:
@@ -68,7 +62,8 @@ if __name__ == "__main__":
   speed = 1000
   stepsize = 0.5
   spawn = (int(width/2), int(height/4))
-  coarse = 20  # pixels per coarse (for discrete simulations)
+  coarse = 20      # pixels per coarse (for discrete simulations)
+  rl_history = 10  # reinf learn: number of vectors to update
 
   # parse command line args
   i = 1
@@ -100,7 +95,9 @@ if __name__ == "__main__":
     i += 1
 
   # play simulation
-  discrete(width, height, coarse, spawn, speed, stepsize)
+  discrete(width, height, coarse, spawn, \
+           rl_history, \
+           speed, stepsize)
 
 
 
