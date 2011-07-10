@@ -9,9 +9,9 @@ from header import *
 # course: size of one 'block' (size between vectors)
 # spawn: spawn location
 # speed: FPS, stepsize: nr of courses per round
-def discrete(width, height, course, spawn, rl_history, speed=1000, stepsize=0.5):
+def discrete(width, height, course, spawn, history, exploration, speed=1000, stepsize=0.5):
   # open window
-  sim = Simulation(width, height, spawn, rl_history=rl_history)
+  sim = Simulation(width, height, spawn, history=history) 
   center = ( int(width / 2), int(height / 2) )
   # make border
   sim.add_object('wall', 'rect',   4, (255, 50, 0), (  3,   3), (width-9, height-9))
@@ -40,8 +40,10 @@ def discrete(width, height, course, spawn, rl_history, speed=1000, stepsize=0.5)
   while True:
     sim.show()
     #sim.ardrone.theta += math.radians(5)
-    sim.ardrone.move(stepsize)
-    sim.ardrone.explore(stepsize, 0.3)
+    if random.random() < exploration:
+      sim.ardrone.explore(stepsize, 2)
+    else:
+      sim.ardrone.move(stepsize)
     time.sleep(1/speed)
 
 def usage(name):
@@ -62,8 +64,9 @@ if __name__ == "__main__":
   speed = 1000
   stepsize = 0.5
   spawn = (int(width/2), int(height/4))
-  coarse = 20      # pixels per coarse (for discrete simulations)
-  rl_history = 10  # reinf learn: number of vectors to update
+  coarse = 20         # pixels per coarse (for discrete simulations)
+  history = 10        # reinf learn: number of vectors to update
+  exploration = 0.2   # reinf learn: chance for exploration move
 
   # parse command line args
   i = 1
@@ -96,7 +99,7 @@ if __name__ == "__main__":
 
   # play simulation
   discrete(width, height, coarse, spawn, \
-           rl_history, \
+           history, exploration, \
            speed, stepsize)
 
 
