@@ -1,0 +1,14 @@
+================
+More information
+================
+
+Books
+ * Probabilistic Robotics
+ * Reinforcement Learning
+
+Movies
+ * Mapping a Suburb with a Single Camera using a Biologically Inspired SLAM System 
+   http://www.youtube.com/watch?v=-0XSUi69Yvs&
+
+Websites
+ * Nick: http://nickd.nl/wiki/thesis

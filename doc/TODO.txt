@@ -1,0 +1,17 @@
+===============
+= TODO Thesis =
+===============
+
+Practical
+  Project management
+    Setting up version management (Mercurial)
+    Creating TODO system (or stay with file)
+
+People
+  Contacting Shimon (Second mentor)
+
+References
+  Nick's blog (http://nickd.nl/wiki/thesis)
+  Porting ROS
+
+

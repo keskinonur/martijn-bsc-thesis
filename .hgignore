@@ -1,0 +1,12 @@
+.*.aux
+.*.log
+.*.nav
+.*.out
+.*.snm
+.*.toc
+.*.bbl
+.*.blg
+.*.swp
+.*.mp4
+.*.pyc
+src/others/robrecht/Examples/Linux/ATest/Build/Release/Movies/

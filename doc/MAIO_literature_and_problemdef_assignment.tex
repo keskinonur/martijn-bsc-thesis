@@ -1,0 +1,55 @@
+\documentclass[11pt]{article}
+
+\title{Bachelor Thesis \\
+       Proposal for Research Question and Literature}
+\author{Martijn van der Veen}
+
+\begin{document}
+
+\maketitle
+
+\section*{Proposal for Research Question}
+% Formuleer een eerste versie van de vraagstelling (in overleg met je begeleider) (max. 200 woorden)
+In the last five decades, Reinforcement Learning has become one of the most important research areas in artifical intelligence, mainly in the area of learning systems. Reinforcement Learning uses the intuitive notion of trying different actions for situations (states), and measuring and evaluating the resulting situation, to determine the best possible action for each state. No direct supervisor is needed in this process. A lot of research has been done applying this framework to games or simulations. Only the last fifteen years Reinforcement Learning has been applied to physical robotic systems. With infinitely many possible states, a lot of discretisation and generalisation must be done before the problem is computable. Furthermore, the input and thus location of the robot is fuzzy and uncertain, especially when using camera's.
+
+I would like to tackle the problem of learning (sub-optimal) paths for robots with vision-based inputs, using reinforcement learning. Thus, I would like to find a general method for path planning using vision and reinforcement learning. Therefore, some image processing and computer vision must be done. A possible approach is using a set of features extracted from the images as state and learn the optimal path using those features only. A second approach is defining a path a priori with only some parameters undefined, and learning these parameters. Since we then need to follow a precise path, a good location estimation is necessary for this second approach.
+
+The precise research question will be shaped in the upcoming conversations with Arnoud Visser and probably Shimon Whiteson.
+
+
+\section*{Literature}
+% Verzamel (evt. met hulp van je begeleider) minimaal vijf relevante artikelen. Maak voor elk artikel een stukje tekst (max. half A4) waarin het belangrijkste punt wordt samen gevat en waarin het verband staat met het onderwerp van je project en met de andere artikelen.
+
+\subsection*{Reward Functions for Accelerated Learning}
+Mataric \cite{mataric} shows that classical Reinforcement Learning is not appropriate for tackling real life robotic problems due to a very large state-space. Using domain knowledge could improve the problem of huge state-spaces by selecting likely states. The framework is validated on a group of mobile robots.
+
+The paper shows a methodology that allows multiple goals as well as using domain knowledge in the reinforcement learning problem. It is a general introduction in RL using physical robots.
+
+\subsection*{The Parti-game Algorithm for Variable Resolution RL in Multidimensional State-spaces}
+In the paper of Andrew W. Moore \cite{moore} the Parti-game algorithm is being introduced for using RL in state-spaces with a lot of dimensions ('features'). As in the last paper, the Parti-game prefers likely states and concentrates high resolution search on these areas. One of the tested simulated problems is path planning. The solution is found in a minimum of trials and time.
+
+Speeding up the computation and bounding the state-space being searched will be important in my attempt to start path-planning in real situations.
+
+\subsection*{Purposive Behavior Acquisition for a Real Robot by Vision-Based Reinforcement Learning}
+In this paper \cite{asada} the practical goal of shooting a ball into a goal is treated. Features are extracted from the images and a state-space is build. Furthermore, a mechanism called Learning from Easy Missions (LEM) is used to decrease the complexity of the state-space. The other papers use other methods for reducing the state-space, so this LEM method is worth looking at. The researches use simple discretized states. Q-learning is used for learning the optimal actions.
+
+This practical problem with its simple states extracted from images for real robots could be a good starting point for research on path planning. Unfortunately, the learning occurs in simulation environment only. The optimal policy is used in the real world afterwards.
+
+\subsection*{Reinforcement Learning for a Vision Based Mobile Robot}
+Another attempt to use RL for a vision-based physical robot \cite{gaskett}. In this paper, in contrary to \cite{asada}, the learning actually occurs in the real world. The camera is being used as the only input. The robot does not learn a specific path, but learns to wander without hitting obstacles. During the wandering process a lot of behaviours occur, which could be used to learn the effect of these behaviours very fast.
+
+Another method called Visual Servoing, which tries to get information of the environment by comparing subsequent images, is used to locate objects. This optical-flow-like method is now used to track those objects in time. The data or 'experience' learned while wandering could be re-used in tasks like visual servoing. This re-using could become handy for my research as well. Training in simulation could prevent damaging a robot by trying a lot of actions in real life, while the trained experience could nevertheless be used in real life.
+
+\subsection*{Reinforcement Learning for Parameter Control of Image-Based Applications}
+In his master thesis \cite{taylor} G. Taylor tries to improve the quality of information extracted from camera images. The parameters of an algorithm are learned with reinforcement learning using visual information. This idea could be extended to path planning where we learn some parameters in a pre-defined path could be learned. This is one of the approaches I could take in my thesis.
+
+\subsection*{More..}
+I'm still searching for good papers on path planning using Reinforcement Learning. It seems to be very difficult to find relevant research on the combination of those research areas.
+
+% Maak een conceptmap voor het onderwerp. Typeer de concepten en label de relaties.
+% ZIE BIJLAGE EN VERGEET DAN DAT CMAPS BESTAAN
+
+\bibliographystyle{plain}
+\bibliography{MAIO_literature_and_problemdef_assignment}
+
+\end{document}

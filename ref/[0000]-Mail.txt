@@ -1,0 +1,49 @@
+[2011/04/18 Arnoud]
+
+ik hoop dat je de Pylon reeds gezien hebt op de site:
+http://www.imav2011.org/images/stories/pole.jpg
+ 
+Het lijkt me dat deze pole goed te herkennen is vanaf een kort afstand. Het pad rond deze pole lijkt me dan ook geen probleem.
+Het probleem is wanneer je omgang rond deze pole moet onderbreken en in welke richting je dan moet vliegen om in de buurt van de
+andere pole te kunnen komen. Ik denk dan ook dat je niet zozeer een kaart of een path moet leren,
+maar een force-field. Voor combinatie van grond en voorwaartse camera moet je een voorkeur richting leren.
+Voor de posities tussen de poles zul je die voorkeurrichting niet onmiddelijk weten, maar dat zou je via value-iteration kunnen schatten.
+Wel is het belangrijk voor de posities waar je de pole herkent, dat je een range en bearing estimate krijgt (die je als voorkeursrichting kan
+opslaan).
+ 
+Wat ik uit je literatuuronderzoek haal is dat er heel veel RL in robotics is gedaan, doch weinig research relevant voor dit probleem.
+Ik denk zelf dat Visual Servoing (and / or Visual Homing) een goede ingang is. -> edit: vergeet dit?
+ 
+Goede ingangen volgens Robin Murphy voor Visual Homing:
+ 
+S.P. Engelson and D.V. McDermott, "Passive Robot Map Building with Exploration Scripts", Technical Report: YALEU/DCS/TR-898, Yale University, Dept. of Computer Science, March 1992.
+ 
+R.C. Nelson, "Visual Homing using an associative memory", Biological Cybernetics, vol. 65, no 4., 1991, pp. 281-291.
+ 
+Deze papers zijn zo oud, dat het misschien verstandig is te kijken via scholar.google wie ze recent geciteerd hebben.
+ 
+Mvg,
+ 
+Arnoud
+ 
+Vergeet ook niet dat je kan meeliften op Nick Dijkshoorn's werk.
+
+
+========================================================================================
+[2011/04/16 Matthijs]
+
+Dat ziet er interessant uit. Qua papers is het eerste waar ik aan denk Andrew Ng's groep in Stanford, die zich bezighoudt met RL voor helicopter control:
+
+http://heli.stanford.edu/
+
+Het gaat hier vooral om acrobatische toeren dus dat is waarschijnlijk ingewikkelder dan je nodig hebt, maar het kan je wel een idee geven, ook als je kijkt naar welke papers zij citeren.
+
+De jaarlijkse RL competitie houdt zich ook bezig met helicopter control, bijv:
+
+http://2009.rl-competition.org/helicopter.php
+
+Dit gaat om helicopter hovering en niet zozeer om navigatie. Rogier Koppejan (toen nog van de UvA) heeft de 2008 competitie gewonnen:
+
+http://staff.science.uva.nl/~whiteson/pubs/b2hd-koppejangecco09.html
+
+Ik kan wel tijd maken om dit te bespreken maar maandag komt me niet zo goed uit. Dinsdag na het DMIS college misschien?

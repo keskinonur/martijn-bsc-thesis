@@ -1,0 +1,2 @@
+clear
+sudo ./../../Sources/UI/steuerung & sudo ./keyboardcontrol

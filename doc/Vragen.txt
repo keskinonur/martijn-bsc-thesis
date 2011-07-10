@@ -1,0 +1,16 @@
+==============
+Bachelorthesis
+==============
+
+# Leren optimale pad.
+# Met Reinforcement learning.
+
+# Leren parameters, of Leren path -> algemeen is handig
+
+# Kaart hebben, of maken?
+
+# Locatie bepalen, of hacks (FSA)
+
+# Literatuur
+
+
