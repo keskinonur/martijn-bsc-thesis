@@ -53,9 +53,7 @@ class ARDrone:
     #print "with force " + str((fx, fy))
 
     # do reinforcement learning steps
-    self.simulation.reinf_learn( (x,y), (vx,vy) )
-    # check for state transition
-    self.simulation.check_for_state_transition(self.location, self.old_location)
+    self.simulation.reinf_learn( self.location, self.old_location, (vx,vy) )
     
   def explore(self, timestep, maximum):
     self.old_location = self.location
@@ -70,9 +68,7 @@ class ARDrone:
     self.speed = (vx + timestep*(fx + ex), vy + timestep*(fy + ey))
 
     # do reinforcement learning steps
-    self.simulation.reinf_learn( (x,y), (vx,vy) )
-    # check for state transition
-    self.simulation.check_for_state_transition(self.location, self.old_location)
+    self.simulation.reinf_learn( self.location, self.old_location, (vx,vy) )
     
 
 
