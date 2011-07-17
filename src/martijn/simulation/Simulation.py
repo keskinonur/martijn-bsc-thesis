@@ -27,6 +27,7 @@ class Simulation:
     self.transitions = list() # transition edges
     self.ardrone = ARDrone(spawn, self)
     self.history = [None]*history
+    self.show_counter = 0
 
 
 
@@ -73,11 +74,36 @@ class Simulation:
   def hit_object(self, loc_new, loc_old):
     for obj in self.objects:
       if self.in_object(obj, loc_new) != self.in_object(obj, loc_old):
-        # ugly hack: undo hitting
-        self.ardrone.location = loc_old
-        self.ardrone.speed = (0, 0)
         return True
     return False
+
+  # Problem specific: don't fly out of window
+  def repair_location(self):
+    x, y = self.ardrone.location
+    w, h = self.width, self.height
+    s = 10
+    if x < s:
+      x = s
+    elif x > (w - s):
+      x = w - s
+    if y < s:
+      y = s
+    elif y > (h - s):
+      y = h - s
+    if self.ardrone.location != (x, y):
+      print "repaired: " + str(self.ardrone.location) + " => " + str((x,y))
+      print "          " + str(self.ardrone.speed) + " => (0, 0)"
+      self.ardrone.location = (x, y)
+      self.ardrone.speed = (0, 0)
+
+        # ugly hack: undo hitting
+        #self.ardrone.location = loc_old
+        #self.ardrone.speed = (0, 0)
+        #if obj[1] == 'rect' and not self.in_object(obj, loc_new):
+          #A = self.ardrone.location
+          #B = [2*x for x in diff(loc_new, loc_old)]
+          #self.ardrone.location = (A[0] - B[0], A[1] - B[1])
+        #print self.ardrone.location
 
   def in_history(self, x, y, stage):
     for hist in self.history:
@@ -90,18 +116,39 @@ class Simulation:
 
   ## Reinforcement Learning
 
-  def reinf_learn(self, current_location, last_location, current_speed):
+  def reinf_learn(self, curr_location, last_location, current_speed):
+    # get some common used variables
+    last_particle = self.get_nearest_particle(last_location)
+    curr_particle = self.get_nearest_particle(curr_location)
+    alpha = 0.4
+    gamma = 0.99
+    self.repair_location()
+    # note: the order here is *important*, don't change!
     # check for state transition
-    self.check_for_state_transition(current_location, last_location)
+    self.check_for_state_transition(curr_location, last_location)
     # reinforcement learning
-    alpha = 0.2
-    self.value_iteration(current_location, last_location, alpha)
-    self.update_particles(current_speed)
-    self.save_current_particle(current_location, current_speed)
+    curr_val, last_val = self.temp_diff(curr_location, last_location, \
+                            curr_particle, last_particle, alpha, gamma)
+    self.update_particles(curr_val, last_val, current_speed, alpha)
+    self.save_current_particle(curr_location, current_speed)
 
-  def value_iteration(self, loc_new, loc_old, alpha):
-    reward = self.reward(loc_new, loc_old)
-    pass # TODO: implement value iteration (last vector)
+  # update value of last location;
+  # returns (curr_val, last_val)
+  def temp_diff(self, curr_location, last_location, curr_particle, last_particle, alpha, gamma):
+    if self.history[0] == None:
+      return (0, 0)
+    curr_x, curr_y, curr_vect, curr_val = curr_particle
+    last_x, last_y, last_vect, last_val = last_particle
+    reward = self.reward(curr_location, last_location)
+    last_stage = self.history[0][2]
+    curr_stage = self.stage # updated by check_for_state_transition
+    # update state value
+    ID = self.get_particle_id( (last_x,last_y), last_stage )
+    new_val = (1 - alpha) * last_val + alpha * (reward + gamma * curr_val)
+    self.stages[last_stage].particles[ID] = (last_x, last_y, last_vect, new_val)
+    return_val = (curr_val, new_val)
+    print return_val
+    return return_val
 
   def reward(self, loc_new, loc_old):
     if self.history[0] == None:
@@ -131,21 +178,27 @@ class Simulation:
 
   # update particles in history, based on reward and time since last visit
   # TODO: use reward, value iteration and time last visit or so
-  def update_particles(self, current_speed):
-    alpha = 0.1
+  def update_particles(self, curr_val, last_val, current_speed, alpha):
     his_speed = current_speed
+    his_val = curr_val
+    #weight_td = last_val - curr_val
     for i in range(len(self.history)):
       if self.history[i] == None:
-        continue
+        return
       x, y, stage, speed = self.history[i]
+      if stage != self.stage:
+        return # don't update after transitions between stages
       ID = self.get_particle_id( (x,y), stage)
       x, y, old_vect, old_val = self.stages[stage].particles[ID]
-      weight = alpha * (1 - (1.0 / len(self.history)) * (i+1))
+      weight_dist = alpha * (1 - (1.0 / len(self.history)) * (i+1))
+      weight_td = his_val - old_val
+      weight = weight_dist * weight_td
       new_vect = (weight*his_speed[0] + (1-weight)*old_vect[0], \
                   weight*his_speed[1] + (1-weight)*old_vect[1])
-      new_val = old_val
+      new_val = old_val # is updated by temp_diff()
       self.stages[stage].particles[ID] = (x, y, new_vect, new_val)
       his_speed = speed
+      his_val = old_val
       
 
   ## 'setters'
@@ -305,6 +358,15 @@ class Simulation:
   ## drawing
 
   def show(self):
+    if self.stages != None and self.stage == None:
+      self.stage = self.stages.keys()[0]
+    
+    #self.show_counter += 1
+    #if self.show_counter < 50:
+    #  return
+    #else:
+    #  self.show_counter = 0
+
     self.scr.fill( (10, 10, 10) )
     # show objects
     for obj in self.objects:
@@ -319,13 +381,15 @@ class Simulation:
     if len(self.stages) == 0:
       print "No stages defined!"
     else:
-      if self.stage == None:
-        self.stage = self.stages.keys()[0]
       for x, y, vect, val in self.stages[self.stage].particles:
         if self.in_history(x, y, self.stage):
-          self.draw_vector(x, y, vect, (255, 50, 50))
+          self.draw_vector(x, y, vect, (255, 255, 50))
         else:
-          self.draw_vector(x, y, vect, (50, 50, 255))
+          if val > 0:
+            r, g, b = 55, (55 + 200*val) % 256, 200
+          else:
+            r, g, b = (55 + -200*val) % 256, 55, 200
+          self.draw_vector(x, y, vect, (r,g,b))
     # show transitions
     for stage_from, stage_to, edge in self.transitions:
       if stage_from == self.stage:
@@ -337,7 +401,6 @@ class Simulation:
 
     # show ardrone
     self.ardrone.draw(self.scr)
-
 
     # display
     pygame.display.flip()

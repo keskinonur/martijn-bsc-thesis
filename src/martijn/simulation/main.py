@@ -9,7 +9,7 @@ from header import *
 # course: size of one 'block' (size between vectors)
 # spawn: spawn location
 # speed: FPS, stepsize: nr of courses per round
-def discrete(width, height, course, spawn, history, exploration, speed=1000, stepsize=0.5):
+def fig8_discrete(width, height, course, spawn, history, exploration, speed=1000, stepsize=0.5):
   # open window
   sim = Simulation(width, height, spawn, history=history) 
   center = ( int(width / 2), int(height / 2) )
@@ -23,28 +23,37 @@ def discrete(width, height, course, spawn, history, exploration, speed=1000, ste
   sim.add_stage('left_to_right')
   sim.add_particles_uniform('all', coarse)
   # add stage transitions
-  trans1 = ('line', (9, center[1]), (1*int(center[0]/2), center[1]))
-  trans2 = ('line', (width-9, center[1]), (3*int(center[0]/2), center[1]))
+  trans1 = ('line', (5, center[1]), (1*int(center[0]/2), center[1]))
+  trans2 = ('line', (width-5, center[1]), (3*int(center[0]/2), center[1]))
   sim.add_stage_transition('right_to_left', 'left_to_right', trans1)
   sim.add_stage_transition('left_to_right', 'right_to_left', trans2)
   
   # add forcefields for objects
-  #                         (r,   pwr)
+  #                         (  obj,   r, pwr)
   sim.add_object_forcefields('all', 150, 20 )
   
   #                         ( stage,   object name,   r,pwr, ang)
-  sim.add_rounded_forcefield('all' , 'pylon_left' , 300, 20,  90)
-  sim.add_rounded_forcefield('all' , 'pylon_right', 300, 20, -90)
+  sim.add_rounded_forcefield('all' , 'pylon_left' , 300, 30,  90)
+  sim.add_rounded_forcefield('all' , 'pylon_right', 300, 30, -90)
   
   # draw
   while True:
-    sim.show()
-    #sim.ardrone.theta += math.radians(5)
-    if random.random() < exploration:
-      sim.ardrone.explore(stepsize, 2)
-    else:
-      sim.ardrone.move(stepsize)
-    time.sleep(1/speed)
+    try:
+      sim.show()
+      #sim.ardrone.theta += math.radians(5)
+      if random.random() < exploration:
+        sim.ardrone.explore(stepsize, 2)
+      else:
+        sim.ardrone.move(stepsize)
+      time.sleep(1/speed)
+    except KeyboardInterrupt:
+      print "\n\n    Stopped simulation program!"
+      exit()
+    except:
+      print "Unexpected error:", sys.exc_info()
+      pygame.display.flip()
+      while True:
+        pass
 
 def usage(name):
   print "Usage: " + name + " [arguments]"
@@ -62,7 +71,7 @@ if __name__ == "__main__":
   width  = 800
   height = 600
   speed = 1000
-  stepsize = 0.5
+  stepsize = 1
   spawn = (int(width/2), int(height/4))
   coarse = 20         # pixels per coarse (for discrete simulations)
   history = 10        # reinf learn: number of vectors to update
@@ -97,10 +106,9 @@ if __name__ == "__main__":
       usage(sys.argv[0])
     i += 1
 
-  # play simulation
-  discrete(width, height, coarse, spawn, \
+  # play discrete simulation for figure-8's
+  fig8_discrete(width, height, coarse, spawn, \
            history, exploration, \
            speed, stepsize)
-
 
 
