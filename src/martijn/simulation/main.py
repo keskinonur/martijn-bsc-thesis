@@ -6,12 +6,14 @@
 from header import *
 
 # width, height: window size
-# course: size of one 'block' (size between vectors)
+# coarse: size of one 'block' (size between vectors)
 # spawn: spawn location
-# speed: FPS, stepsize: nr of courses per round
-def fig8_discrete(width, height, course, spawn, history, exploration, speed=1000, stepsize=0.5):
+# speed: FPS, stepsize: nr of coarses per round
+def fig8_discrete(width, height, coarse, spawn, history, exploration, \
+                  constant_speed, speed=1000, stepsize=0.5):
   # open window
-  sim = Simulation(width, height, spawn, history=history) 
+  sim = Simulation(width, height, spawn, coarse=coarse, history=history) 
+  sim.constant_speed = constant_speed
   center = ( int(width / 2), int(height / 2) )
   # make border
   sim.add_object('wall', 'rect',   4, (255, 50, 0), (  3,   3), (width-9, height-9))
@@ -63,6 +65,7 @@ def usage(name):
   print " -t <float>: size of timestep per round"
   print " -p <int> <int>: spawn location"
   print " -c <int>: coarse (# pixels per coarse)"
+  print " -o <int>: use contant speed (1 or 0)"
   exit()
 
 if __name__ == "__main__":
@@ -70,12 +73,13 @@ if __name__ == "__main__":
   # default settings
   width  = 800
   height = 600
-  speed = 1000
+  speed = 10000
   stepsize = 1
   spawn = (int(width/2), int(height/4))
   coarse = 20         # pixels per coarse (for discrete simulations)
-  history = 10        # reinf learn: number of vectors to update
+  history = 2        # reinf learn: number of vectors to update
   exploration = 0.2   # reinf learn: chance for exploration move
+  constant_speed = True
 
   # parse command line args
   i = 1
@@ -100,7 +104,10 @@ if __name__ == "__main__":
     # coarse size
     elif arg == "-c":
       i += 1
-      coarse = sys.argv[i]
+      coarse = int(sys.argv[i])
+    elif arg == "-o":
+      i += 1
+      constant_speed = bool(sys.argv[i])
     else:
       print arg
       usage(sys.argv[0])
@@ -108,7 +115,7 @@ if __name__ == "__main__":
 
   # play discrete simulation for figure-8's
   fig8_discrete(width, height, coarse, spawn, \
-           history, exploration, \
+           history, exploration, constant_speed, \
            speed, stepsize)
 
 

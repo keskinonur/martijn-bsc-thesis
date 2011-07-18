@@ -1,7 +1,4 @@
-# simulation of RL techniques for ARDrone
-# spring 2011
-# author: martijn van der veen
-# licence: GPLv3
+# simulation of RL techniques for ARDrone # spring 2011 # author: martijn van der veen # licence: GPLv3
 
 from header import *
 
@@ -12,6 +9,8 @@ class ARDrone:
     self.theta = 0
     self.speed = (0, 0)
     self.location = location
+    self.constant_speed = False
+    self.maximum_speed = 30       # none or integer
     self.old_location = location
     self.simulation = simulation
 
@@ -37,38 +36,54 @@ class ARDrone:
     pygame.draw.line(scr, self.color, l_start, l_stop, 2)
 
 
-  def move(self, timestep, decay=0.0005):
+  def move(self, timestep, decay=0.005):
     self.old_location = self.location
     x,  y  = self.location
     vx, vy = self.speed
     fx, fy = self.simulation.get_force(self.location)
     # update location
     self.location = (x + timestep * vx, y + timestep * vy)
+    # update speed
     # TODO: make more realistic decay
     self.speed = (vx + timestep*fx - timestep*decay * vx*vx*vx, \
                   vy + timestep*fy - timestep*decay * vy*vy*vy)
+    if self.constant_speed:
+      if self.speed == (0, 0):
+        self.speed = unit( (random.random(), random.random()) )
+      else:
+        self.speed = unit(self.speed)
+    # maximum speed:
+    if self.maximum_speed != None and norm(self.speed) > self.maximum_speed:
+       print "! lowered speed from " + str(norm(self.speed)) + " to " + str(self.maximum_speed)
+       speed_factor = self.maximum_speed / norm(self.speed)
+       self.speed = (self.speed[0] / speed_factor, self.speed[1] / speed_factor)
     # for fun: set angle
     self.theta = math.acos(dot(unit(self.speed), (1, 0)))
-    #print self.speed
-    #print "with force " + str((fx, fy))
 
     # do reinforcement learning steps
     self.simulation.reinf_learn( self.location, self.old_location, (vx,vy) )
     
-  def explore(self, timestep, maximum):
+  def explore(self, timestep, maximum, decay=0.005):
     self.old_location = self.location
     x,  y  = self.location
     vx, vy = self.speed
-    fx, fy = self.simulation.get_force(self.location)
+    #fx, fy = self.simulation.get_force(self.location)
     vect_e = unit((0.5 - random.random(), 0.5 - random.random()))
     scal_e = random.random() * maximum
     ex, ey = (scal_e * vect_e[0], scal_e * vect_e[1])
     # update location
     self.location = (x + timestep * vx, y + timestep * vy)
-    self.speed = (vx + timestep*(fx + ex), vy + timestep*(fy + ey))
+    # update speed
+    self.speed = (vx + timestep*(ex) - timestep*decay * vx*vx*vx, \
+                  vy + timestep*(ey) - timestep*decay * vy*vy*vy,)
+    if self.constant_speed:
+      if self.speed == (0, 0):
+        self.speed = unit( (random.random(), random.random()) )
+      else:
+        self.speed = unit(self.speed)
 
     # do reinforcement learning steps
-    self.simulation.reinf_learn( self.location, self.old_location, (vx,vy) )
+    self.simulation.reinf_learn( self.location, self.old_location, (vx,vy), explore=True )
     
 
 

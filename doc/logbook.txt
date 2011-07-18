@@ -76,5 +76,6 @@ zoeken naar papers:
 * "force field" robotics
 * "AR.Drone"
 * force field navigation
+* "potential field" "reinforcement learning" maze
 
 
