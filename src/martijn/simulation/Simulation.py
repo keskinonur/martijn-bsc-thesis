@@ -5,9 +5,8 @@
 
 from header import *
 import sys
-import time
-import random
-import math
+import time, datetime
+import random, math
 import pygame
 from LA import *             # linear algebra functions
 from Simulation import *     # simulation object (window, ardrone, field)
@@ -16,7 +15,7 @@ from ARDrone import *        # ARDrone object
 
 class Simulation:
 
-  def __init__(self, width, height, spawn, history=10):
+  def __init__(self, width, height, spawn, coarse=10, history=10):
     pygame.init()
     self.width  = width
     self.height = height
@@ -26,8 +25,13 @@ class Simulation:
     self.stage = None     # current stage (string)
     self.transitions = list() # transition edges
     self.ardrone = ARDrone(spawn, self)
+    self.ardrone.constant_speed = False
     self.history = [None]*history
+    self.coarse = coarse
     self.show_counter = 0
+    # stats
+    self.transition_count = 0
+    self.starttime = time.time()
 
 
 
@@ -51,21 +55,24 @@ class Simulation:
           # (ad x ab) < 0 and (ba x bc) < 0 and (cb x cd) < 0 and (dc x da) < 0
           if sign(a, b, c) == sign(b, c, d) == sign(c, d, a) == sign(d, a, b):
             self.stage = stage_to
-            print ">> Transition: " + stage_from + " -> " + stage_to
+            self.transition_count += 1
+            #print ">> Transition: " + stage_from + " -> " + stage_to
+            self.print_stats()
 
   def in_object(self, obj, loc):
     name, shape, width, color, coord1, coord2 = obj
     x, y = loc
+    r = 8  # radius of ardrone
     if shape == 'rect':
       obj_x1, obj_x2 = min(coord1[0], coord2[0]), max(coord1[0], coord2[0])
       obj_y1, obj_y2 = min(coord1[1], coord2[1]), max(coord1[1], coord2[1])
-      if x > obj_x1 and x < obj_x2 and y > obj_y1 and y < obj_y2:
+      if (x - 2*r) > obj_x1 and (x + 2*r) < obj_x2 and (y - 2*r) > obj_y1 and (y + 2*r) < obj_y2:
         return True
       else:
         return False
     elif shape == 'circle':
-      r = dist(coord1, loc)
-      if r < coord2:
+      radius = dist(coord1, loc) - 2*r
+      if radius < coord2:
         return True
       else:
         return False
@@ -78,21 +85,49 @@ class Simulation:
     return False
 
   # Problem specific: don't fly out of window
-  def repair_location(self):
-    x, y = self.ardrone.location
-    w, h = self.width, self.height
-    s = 10
-    if x < s:
-      x = s
-    elif x > (w - s):
-      x = w - s
-    if y < s:
-      y = s
-    elif y > (h - s):
-      y = h - s
+  def repair_location(self, loc_new, loc_old):
+
+    if self.hit_object(loc_new, loc_old):
+      # repair it
+      self.ardrone.location = loc_old # TODO: this is too ugly
+      self.ardrone.speed = (0,0)
+      # return it
+      return True
+    else:
+      return False
+    
+    #if self.history[0] == None:
+    #  stuck = False
+    #else:
+    #  p1_x, p1_y, p1_stage, foo = self.history[0]
+    #  stuck = True
+    #  for i in range(1, len(self.history)):
+    #    if self.history[i] == None:
+    #      stuck = False
+    #      break
+    #    p2_x, p2_y, p2_stage, foo = self.history[i]
+    #    if ( (p1_x,p1_y,p1_stage) != (p2_x,p2_y,p2_stage) ):
+    #      stuck = False
+    #      break
+          
+    # if stuck on same place for whole history,
+    # take more distance from edges
+    #if stuck:
+    #  s = s * 2
+    # put back in window
+    #if x < s:
+    #  x = s
+    #elif x > (w - s):
+    #  x = w - s
+    #if y < s:
+    #  y = s
+    #elif y > (h - s):
+    #  y = h - s
+    #if stuck:
+    #  print "! Stuck on wall!"
     if self.ardrone.location != (x, y):
-      print "repaired: " + str(self.ardrone.location) + " => " + str((x,y))
-      print "          " + str(self.ardrone.speed) + " => (0, 0)"
+      print "! Repaired: " + str(self.ardrone.location) + " => " + str((x,y))
+      print "            " + str(self.ardrone.speed) + " => (0, 0)"
       self.ardrone.location = (x, y)
       self.ardrone.speed = (0, 0)
 
@@ -116,48 +151,61 @@ class Simulation:
 
   ## Reinforcement Learning
 
-  def reinf_learn(self, curr_location, last_location, current_speed):
+  def reinf_learn(self, curr_location, last_location, current_speed, explore=False):
     # get some common used variables
     last_particle = self.get_nearest_particle(last_location)
     curr_particle = self.get_nearest_particle(curr_location)
+    if last_particle == None or curr_particle == None:
+      print "AR.Drone possably out of sight. This is not good."
+      self.repair_location(curr_location, last_location)
+      return
     alpha = 0.4
-    gamma = 0.99
-    self.repair_location()
+    gamma = 0.8
     # note: the order here is *important*, don't change!
     # check for state transition
     self.check_for_state_transition(curr_location, last_location)
     # reinforcement learning
-    curr_val, last_val = self.temp_diff(curr_location, last_location, \
-                            curr_particle, last_particle, alpha, gamma)
-    self.update_particles(curr_val, last_val, current_speed, alpha)
+    collision = self.repair_location(curr_location, last_location)
+    current_speed = self.ardrone.speed
+    curr_location = self.ardrone.location
+    if not explore:
+      curr_val, last_val = self.temp_diff(curr_location, last_location, \
+                              curr_particle, last_particle, collision, alpha, gamma)
+      self.update_particles(curr_val, last_val, current_speed, alpha)
     self.save_current_particle(curr_location, current_speed)
 
   # update value of last location;
   # returns (curr_val, last_val)
-  def temp_diff(self, curr_location, last_location, curr_particle, last_particle, alpha, gamma):
+  def temp_diff(self, curr_location, last_location, curr_particle, last_particle, collision, alpha, gamma):
     if self.history[0] == None:
       return (0, 0)
     curr_x, curr_y, curr_vect, curr_val = curr_particle
     last_x, last_y, last_vect, last_val = last_particle
-    reward = self.reward(curr_location, last_location)
+    reward = self.reward(curr_location, last_location, collision)
     last_stage = self.history[0][2]
     curr_stage = self.stage # updated by check_for_state_transition
+    if last_stage != curr_stage:
+      curr_val = 0 # after stage transition, no further reward could be gained
     # update state value
     ID = self.get_particle_id( (last_x,last_y), last_stage )
     new_val = (1 - alpha) * last_val + alpha * (reward + gamma * curr_val)
+    if new_val > 1:
+      print "MoreThanOneError:", (1 - alpha), last_val, alpha, (reward + gamma*curr_val)
     self.stages[last_stage].particles[ID] = (last_x, last_y, last_vect, new_val)
     return_val = (curr_val, new_val)
-    print return_val
+    #print return_val
     return return_val
 
-  def reward(self, loc_new, loc_old):
+  def reward(self, loc_new, loc_old, collision):
     if self.history[0] == None:
       return 0
     # check for state transition
     x, y, last_stage, speed = self.history[0]
     if last_stage != self.stage:
+      print "+1"
       return 1
-    if self.hit_object(loc_new, loc_old):
+    if collision:
+      print "-1"
       return -1
     return 0
 
@@ -177,10 +225,10 @@ class Simulation:
       self.history[0] = (x,y,stage, speed)
 
   # update particles in history, based on reward and time since last visit
-  # TODO: use reward, value iteration and time last visit or so
   def update_particles(self, curr_val, last_val, current_speed, alpha):
     his_speed = current_speed
     his_val = curr_val
+    weight_dist = 1
     #weight_td = last_val - curr_val
     for i in range(len(self.history)):
       if self.history[i] == None:
@@ -190,12 +238,28 @@ class Simulation:
         return # don't update after transitions between stages
       ID = self.get_particle_id( (x,y), stage)
       x, y, old_vect, old_val = self.stages[stage].particles[ID]
-      weight_dist = alpha * (1 - (1.0 / len(self.history)) * (i+1))
+      # last n items will be updated;
+      # weighted with time not seen (logarithmic)
+      # > for alpha = 0.8 this is almost identical to:
+      # > alpha * (1 - (1.0 / len(self.history)) * (i+1))
+      weight_dist = alpha * weight_dist
       weight_td = his_val - old_val
       weight = weight_dist * weight_td
-      new_vect = (weight*his_speed[0] + (1-weight)*old_vect[0], \
-                  weight*his_speed[1] + (1-weight)*old_vect[1])
+      his_norm = norm(his_speed)
+      old_norm = norm(old_vect)
+      #his_speed = unit(his_speed)
+      if his_speed != (0, 0):
+        #his_speed = (old_norm*unit(his_speed)[0], old_norm*unit(his_speed)[1])
+        #old_vect = unit(old_vect)
+        new_vect = (weight*his_speed[0] + (1-weight)*old_vect[0], \
+                    weight*his_speed[1] + (1-weight)*old_vect[1])
+      else:
+        new_vect = old_vect
       new_val = old_val # is updated by temp_diff()
+      max_length = 30
+      if norm(new_vect) > max_length:
+        print "! Something went wrong, norm of " + str((x, y)) + " particle is " + str(norm(new_vect))
+        new_vect = (unit(new_vect)[0]*max_length, unit(new_vect)[1]*max_length)
       self.stages[stage].particles[ID] = (x, y, new_vect, new_val)
       his_speed = speed
       his_val = old_val
@@ -325,6 +389,7 @@ class Simulation:
 
   def get_nearest_particle(self, loc, notlist=list()):
     if len(self.stages[self.stage].particles) == 0:
+      print "No particles in stage " + self.stage + "!"
       return None
     nearest  = None
     distance = 1000000
@@ -357,15 +422,40 @@ class Simulation:
     
   ## drawing
 
+  def print_stats(self):
+    timesmp = int(time.time() - self.starttime)
+    time_hour = timesmp / (60*60)
+    timesmp = timesmp % (60*60)
+    time_min = timesmp / (60)
+    timesmp = timesmp % (60)
+    time_sec = timesmp
+    timestr = str(time_hour)+":"+str(time_min)+":"+str(time_sec)
+    #timestr = datetime.datetime.fromtimestamp(timesmp).strftime('%d %H:%M:%S')
+    print "# Number of transitions: " + str(self.transition_count)
+    print "# Time running:          " + timestr
+    # test: print state values
+    extreme = list()
+    a, b = 0, int((self.height-self.coarse/2)/self.coarse)
+    for x, y, vect, val in self.stages[self.stage].particles:
+      a += 1
+      if a <= b:
+        print "%3.0f " % (1000*val),
+      else:
+        print "%3.0f " % (1000*val)
+        a = 0
+      if val < -0.95 or val > 0.95:
+        extreme.append(val)
+    print "extreme: " + str(extreme)
+
   def show(self):
     if self.stages != None and self.stage == None:
       self.stage = self.stages.keys()[0]
     
-    #self.show_counter += 1
-    #if self.show_counter < 50:
-    #  return
-    #else:
-    #  self.show_counter = 0
+    self.show_counter += 1
+    if self.show_counter < 1:
+      return
+    else:
+      self.show_counter = 0
 
     self.scr.fill( (10, 10, 10) )
     # show objects
