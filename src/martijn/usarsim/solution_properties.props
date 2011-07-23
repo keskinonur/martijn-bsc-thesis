@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="UserMacros">
+    <ARDroneLibDir>C:\Users\Turiphro\Desktop\thesis_workdir\code\ARDrone_SDK_1_6_20110224\ARDroneLib</ARDroneLibDir>
+    <ARDroneWin32Dir>C:\Users\Turiphro\Desktop\thesis_workdir\code\cpp\ardrone_slam\ardronewin32</ARDroneWin32Dir>
+    <OpenCVDir>C:\OpenCV2.2</OpenCVDir>
+    <MatlabDir>C:\Program Files\MATLAB\R2010a\extern</MatlabDir>
+    <SDLDir>C:\Users\Turiphro\Desktop\thesis_workdir\code\SDL-1.2.14</SDLDir>
+	<YAMLDir>C:\Users\Turiphro\Desktop\thesis_workdir\code\cpp\ardrone_slam\yaml-cpp-0.2.5</YAMLDir>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <BuildMacro Include="ARDroneLibDir">
+      <Value>$(ARDroneLibDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ARDroneWin32Dir">
+      <Value>$(ARDroneWin32Dir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="OpenCVDir">
+      <Value>$(OpenCVDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="MatlabDir">
+      <Value>$(MatlabDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="SDLDir">
+      <Value>$(SDLDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="YAMLDir">
+      <Value>$(YAMLDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

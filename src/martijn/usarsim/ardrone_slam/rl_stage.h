@@ -1,0 +1,22 @@
+#pragma once
+
+#include "reinflearn.h"
+
+class rl_stage
+{
+public:
+	// vars
+	class reinflearn *rl;
+	class rl_forcefield *ff;
+	struct rl_transition *tr;
+	
+	// methods
+	rl_stage(reinflearn *rl);
+	~rl_stage(void);
+	void add_stage_transition(double v1[2], double v2[2], rl_stage *stage);
+	
+	// visualisations
+	void save_to_file(char *filename);
+
+};
+
