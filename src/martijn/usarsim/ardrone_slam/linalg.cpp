@@ -23,8 +23,13 @@ double dist(double vect1[2], double vect2[2]) {
 
 void unit(double vect_in[2], double vect_out[2]) {
 	double length = norm(vect_in);
-	vect_out[0] = vect_in[0] / norm(vect_in);
-	vect_out[1] = vect_in[1] / norm(vect_in);
+	if (length == 0) {
+		vect_out[0] = 0;
+		vect_out[1] = 0;
+	} else {
+		vect_out[0] = vect_in[0] / length;
+		vect_out[1] = vect_in[1] / length;
+	}
 }
 
 void add(double vect1[2], double vect2[2], double vect_out[2]) {
@@ -39,8 +44,10 @@ void diff(double vect1[2], double vect2[2], double vect_out[2]) {
 
 // angle in rad
 void rot(double vect_in[2], double angle, double vect_out[2]) {
-	vect_out[0] = cos(angle) * vect_in[0] - sin(angle) * vect_in[1];
-	vect_out[1] = sin(angle) * vect_in[0] + cos(angle) * vect_in[1];
+	double x = vect_in[0];
+	double y = vect_in[1];
+	vect_out[0] = cos(angle) * x - sin(angle) * y;
+	vect_out[1] = sin(angle) * x + cos(angle) * y;
 }
 
 void cp(double vect_in[2], double vect_out[2]) {

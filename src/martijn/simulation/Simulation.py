@@ -476,9 +476,9 @@ class Simulation:
           self.draw_vector(x, y, vect, (255, 255, 50))
         else:
           if val > 0:
-            r, g, b = 55, (55 + 200*val) % 256, 200
+            r, g, b = 55, min(55 + 200*val, 255), 200
           else:
-            r, g, b = (55 + -200*val) % 256, 55, 200
+            r, g, b = min(55 + -200*val, 255), 55, 200
           self.draw_vector(x, y, vect, (r,g,b))
     # show transitions
     for stage_from, stage_to, edge in self.transitions:

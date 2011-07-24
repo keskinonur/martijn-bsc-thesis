@@ -37,6 +37,8 @@ typedef struct rl_layout {
 	double pylon2[2];
 	double pylonr;
 	double coarse;
+	// reinf learn:
+	int history;
 } rl_layout;
 
 typedef struct rl_transition {
@@ -65,6 +67,9 @@ public:
 	// control robot
 	void control_set(int type, double velocity);
 	void fly_vector(double vect[2]);
+
+	// helper functions
+	long timestamp_millis();
 	
 //private:
 	

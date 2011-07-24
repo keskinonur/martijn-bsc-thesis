@@ -64,3 +64,128 @@ rl_particle *rl_forcefield::get_nearest_particle(double loc[2], rl_particle *sta
 	}
 	return curr;
 }
+
+
+// after stage transition we need to find the corresponding particle
+rl_particle *rl_forcefield::get_matching_particle(rl_particle *search)
+{
+	// find horizontal match
+	rl_particle *curr = &particles[0];
+	while(curr->loc[0] != search->loc[0]) {
+		 curr = curr->right;
+	}
+	// find vertical match
+	while(curr->loc[1] != search->loc[1]) {
+		curr = curr->bottom;
+	}
+	return curr;
+}
+
+// setting force fields
+double rl_forcefield::fdv(double distance, double maximum)
+{
+	return 0.5 * pow(2, 1.0 - 5.0*distance/maximum);
+}
+
+// wall
+void rl_forcefield::add_rect_forces(double loc1[2], double loc2[2], double pwr, double range)
+{
+	double distance;
+	double x, y;
+	double force[2];
+	double scalar;
+	for (int i=0; i<particle_count; i++) {
+		x = particles[i].loc[0];
+		y = particles[i].loc[1];
+		distance = 0;
+		if (abs(x - loc1[0]) < range) {
+			// left
+			distance = abs(x - loc1[0]);
+			force[0] = 1;
+			force[1] = 0;
+			scalar = pwr * fdv(distance, range);
+			force[0] *= scalar; force[1] *= scalar;
+			add(particles[i].vect, force, particles[i].vect); // add and save
+		}
+		if (abs(x - loc2[0]) < range) {
+			// right
+			distance = abs(x - loc2[0]);
+			force[0] = -1;
+			force[1] = 0;
+			scalar = pwr * fdv(distance, range);
+			force[0] *= scalar; force[1] *= scalar;
+			add(particles[i].vect, force, particles[i].vect); // add and save
+		}
+		if (abs(y - loc1[1]) < range) {
+			// top
+			distance = abs(y - loc1[1]);
+			force[0] = 0;
+			force[1] = 1;
+			scalar = pwr * fdv(distance, range);
+			force[0] *= scalar; force[1] *= scalar;
+			add(particles[i].vect, force, particles[i].vect); // add and save
+		}
+		if (abs(y - loc2[1]) < range) {
+			// bottom
+			distance = abs(y - loc2[1]);
+			force[0] = 0;
+			force[1] = -1;
+			scalar = pwr * fdv(distance, range);
+			force[0] *= scalar; force[1] *= scalar;
+			add(particles[i].vect, force, particles[i].vect); // add and save
+		}
+	}
+}
+
+// pylon
+void rl_forcefield::add_circle_forces(double loc[2], double radius, double pwr, double range)
+{
+	double distance;
+	double force[2];
+	double scalar;
+	for (int i=0; i<particle_count; i++) {
+		distance = dist(particles[i].loc, loc);
+		if (distance - radius < range) {
+			scalar = pwr * fdv(distance, range - radius);
+			diff(particles[i].loc, loc, force);
+			unit(force, force);
+			force[0] *= scalar; force[1] *= scalar;
+			add(particles[i].vect, force, particles[i].vect); // add and save
+		}
+	}
+}
+
+// pylon spiral forces
+void rl_forcefield::add_spiral_forces(double loc[2], double radius, double pwr, double range, double angle)
+{
+	double distance;
+	double force[2];
+	double scalar;
+	for (int i=0; i<particle_count; i++) {
+		distance = dist(particles[i].loc, loc);
+		if (distance - radius < range) {
+			scalar = pwr * fdv(distance, range - radius);
+			diff(particles[i].loc, loc, force);
+			rot(force, angle, force);
+			unit(force, force);
+			force[0] *= scalar;
+			force[1] *= scalar;
+			add(particles[i].vect, force, particles[i].vect); // add and save
+		}
+	}
+
+}
+
+// bias towards goal (pylon)
+void rl_forcefield::add_attract_forces(double loc[2], double pwr)
+{
+	double force[2];
+	double scalar = pwr;
+	for (int i=0; i<particle_count; i++) {
+		diff(loc, particles[i].loc, force);
+		unit(force, force);
+		force[0] *= scalar;
+		force[1] *= scalar;
+		add(particles[i].vect, force, particles[i].vect);
+	}
+}

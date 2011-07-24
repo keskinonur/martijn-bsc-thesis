@@ -10,12 +10,11 @@
 .*.mp4
 .*.pyc
 .*.pdf
+.*.sdf
+.*~
 src/others/robrecht/Examples/Linux/ATest/Build/Release/Movies/
-src/martijn/usarsim/Debug
-src/martijn/usarsim/.svn
 src/martijn/usarsim/ipch
-src/martijn/usarsim/ardrone_slam/Debug
-src/martijn/usarsim/ardrone_slam/.svn
 src/martijn/usarsim/ardrone_slam/x64
-src/martijn/usarsim/ardrone_slam.sdf
 src/martijn/particles.txt
+.*Debug
+.*.svn
