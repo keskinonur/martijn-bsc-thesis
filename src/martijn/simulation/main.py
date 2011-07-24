@@ -57,6 +57,76 @@ def fig8_discrete(width, height, coarse, spawn, history, exploration, \
       while True:
         pass
 
+def file_watch():
+  ## settings
+  scale = 50
+  offset = (-9.75, -7.25)
+  width = 2 * 9.75
+  height = 2 * 7.25
+  pylon1 = (4.5, 0.1)
+  pylon2 = (-5.1, 0.1)
+  pylonr = 0.45
+  coarse = 1
+  history = 10
+  spawn = (width/2, height/2)
+  filename = '../particles.txt'
+
+  # apply offset and scale, make integers
+  width  = int(width*scale)
+  height = int(height*scale)
+  pylon1 = ( int((pylon1[0]-offset[0])*scale), int((pylon1[1]-offset[1])*scale) )
+  pylon2 = ( int((pylon2[0]-offset[0])*scale), int((pylon2[1]-offset[1])*scale) )
+  pylonr = int(pylonr*scale)
+  coarse = int(coarse*scale)
+  spawn  = ( int(spawn[0]*scale), int(spawn[1]*scale) )
+
+  ## start simulation and show
+  sim = Simulation(width, height, spawn, coarse=coarse, history=history)
+  # make border
+  sim.add_object('wall', 'rect',   4, (255, 50, 0), (  1,   1), (width-1, height-1))
+  # make pylons
+  sim.add_object('pylon_left',  'circle', 0, (255, 50, 0), pylon1, pylonr)
+  sim.add_object('pylon_right', 'circle', 0, (255, 50, 0), pylon2, pylonr)
+  # add stages
+  sim.add_stage('show_stage')
+  sim.stage = 'show_stage'
+
+  # loop that checks for file changes and shows particles
+  last = 0
+  while True:
+    while True:
+      try:
+        if os.path.getmtime(filename) != last:
+          break
+      except KeyboardInterrupt:
+        exit()
+      except:
+        pass
+    last = os.path.getmtime(filename)
+    # read file
+    fp = open(filename, 'r')
+    particles = [line.split() for line in fp.readlines()]
+    if len(particles) > 1:
+      loc = particles[0]
+      p_x, p_y, p_vx, p_vy = particles[1]
+      particles = particles[2:]
+      # add particles
+      sim.ardrone.location = (int( (float(loc[0])) * scale), \
+                              int( (float(loc[1])) * scale))
+      sim.stages[sim.stage].particles = list()
+      for x, y, v_x, v_y, val in particles:
+        particle = ( int(float(x)*scale), int(float(y)*scale), (int(float(v_x)*scale), \
+                     int(float(v_y)*scale)), float(val) )
+        sim.stages[sim.stage].particles.append( particle )
+      # show
+      sim.show()
+      sim.draw_vector(int(float(p_x)*scale), int(float(p_y)*scale), \
+          (int(float(p_vx)*scale),int(float(p_vy)*scale)), (0, 255, 0))
+      pygame.display.flip()
+    fp.close()
+
+
+
 def usage(name):
   print "Usage: " + name + " [arguments]"
   print " arguments:"
@@ -66,6 +136,7 @@ def usage(name):
   print " -p <int> <int>: spawn location"
   print " -c <int>: coarse (# pixels per coarse)"
   print " -o <int>: use contant speed (1 or 0)"
+  print " -f: file_watcher: don't simulate but show particles from file"
   exit()
 
 if __name__ == "__main__":
@@ -80,6 +151,7 @@ if __name__ == "__main__":
   history = 2        # reinf learn: number of vectors to update
   exploration = 0.2   # reinf learn: chance for exploration move
   constant_speed = True
+  file_watcher = False
 
   # parse command line args
   i = 1
@@ -108,14 +180,20 @@ if __name__ == "__main__":
     elif arg == "-o":
       i += 1
       constant_speed = bool(sys.argv[i])
+    elif arg == "-f":
+      file_watcher = True
     else:
       print arg
       usage(sys.argv[0])
     i += 1
 
-  # play discrete simulation for figure-8's
-  fig8_discrete(width, height, coarse, spawn, \
-           history, exploration, constant_speed, \
-           speed, stepsize)
+  if file_watcher:
+    # start file watcher
+    file_watch()
+  else:
+    # play discrete simulation for figure-8's
+    fig8_discrete(width, height, coarse, spawn, \
+              history, exploration, constant_speed, \
+              speed, stepsize)
 
 
