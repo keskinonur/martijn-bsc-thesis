@@ -372,6 +372,25 @@ class Simulation:
           vect_new = add(vect, vect_force)
           self.stages[stage].particles[i] = (x, y, vect_new, val)
         
+  def add_attracting_force(self, stage_name, name, strength):
+    name, shape, width, color, coord1, coord2 = self.get_object_by_name(name)
+    stages = list()
+    if stage_name == "all":
+      stages = self.stages.keys()
+    else:
+      stages = [stage_name]
+    for stage in stages:
+      # add force to all vectors,
+      # for point (thus circle) objects only!
+      for i in range(len(self.stages[stage].particles)):
+        x, y, vect, val = self.stages[stage].particles[i]
+        scal_force = strength
+        vect_force = unit(diff(coord1, (x,y)))
+        vect_force = (strength*vect_force[0], \
+                      strength*vect_force[1])
+        vect_new = add(vect, vect_force)
+        self.stages[stage].particles[i] = (x, y, vect_new, val)
+
   def add_stage(self, name):
     self.stages[name] = ForceField(name)
 

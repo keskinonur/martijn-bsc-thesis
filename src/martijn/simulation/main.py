@@ -57,6 +57,67 @@ def fig8_discrete(width, height, coarse, spawn, history, exploration, \
       while True:
         pass
 
+def goaldirected_discrete(constant_speed=1, speed=1000, stepsize=0.5):
+  width   = 800
+  height  = 400
+  spawn   = (20, 20)
+  coarse  = 30
+  history = 100
+  # open window
+  sim = Simulation(width, height, spawn, coarse=coarse, history=history) 
+  sim.constant_speed = constant_speed
+  ## make border
+  #sim.add_object('wall', 'rect',   4, (255, 50, 0), (  3,   3), (width-9, height-9))
+  # make obstacles
+  sim.add_object('obst1', 'circle', 0, (255, 50, 0), \
+                 (100, 350), 10)
+  sim.add_object('obst2', 'circle', 0, (255, 50, 0), \
+                 (500, 200), 10)
+  sim.add_object('obst3', 'circle', 0, (255, 50, 0), \
+                 (250, 280), 10)
+  sim.add_object('obst4', 'circle', 0, (255, 50, 0), \
+                 (600, 300), 25)
+  sim.add_object('obst5', 'circle', 0, (255, 50, 0), \
+                 (450, 50), 25)
+  # add stages
+  sim.add_stage('move_to_goal')
+  sim.add_particles_uniform('all', coarse)
+  # add stage transitions
+  trans1 = ('line', (width, 400), (width, 500))
+  sim.add_stage_transition('move_to_goal', 'move_to_goal', trans1)
+  
+  # add forcefields for objects
+  #                         (  obj,   r, pwr)
+  sim.add_object_forcefields('all', 200, 35 )
+  
+  #                         ( stage,   object name,   r,pwr, ang)
+  sim.add_rounded_forcefield('all' , 'obst3' , 300, 50, -90)
+  sim.add_rounded_forcefield('all' , 'obst4' , 300, 50,  90)
+  # create goal
+  sim.add_object('goal', 'rect', 0, (50, 255, 0), \
+                (750, 200), (710, 101))
+                 #(700, 200), (701, 201))
+  sim.add_attracting_force('all', 'goal', 10)
+  
+  # draw
+  while True:
+    try:
+      sim.show()
+      #sim.ardrone.theta += math.radians(5)
+      if random.random() < exploration:
+        sim.ardrone.explore(stepsize, 2)
+      else:
+        sim.ardrone.move(stepsize)
+      time.sleep(1/speed)
+    except KeyboardInterrupt:
+      print "\n\n    Stopped simulation program!"
+      exit()
+    except:
+      print "Unexpected error:", sys.exc_info()
+      pygame.display.flip()
+      while True:
+        pass
+
 def file_watch():
   ## settings
   scale = 50
@@ -191,6 +252,9 @@ if __name__ == "__main__":
     # start file watcher
     file_watch()
   else:
+    
+    #goaldirected_discrete()
+    
     # play discrete simulation for figure-8's
     fig8_discrete(width, height, coarse, spawn, \
               history, exploration, constant_speed, \
