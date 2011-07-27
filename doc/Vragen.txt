@@ -2,6 +2,7 @@
 Bachelorthesis Vragen
 =====================
 
-- goed in algemeen? missen dingen?
+- goed in algemeen? missen dingen? verbositeit goed?
 
 - implementatie-sectie?
+- referentiestyle goed?
