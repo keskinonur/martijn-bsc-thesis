@@ -1,7 +1,7 @@
 \documentclass[11pt]{article}
 \usepackage[UKenglish]{babel}
 \usepackage{graphicx}
-%\usepackage{amsmath}
+\usepackage{amsmath}
 
 \usepackage{parskip}
 % same as: Dutch style of paragraph formatting, i.e. no indents. 
@@ -20,7 +20,7 @@
 \vspace{2.5cm}
 
 \begin{huge}
-Optimizing artificial force fields for autonomous drones in figure-8 challenge using Reinforcement Learning
+Optimizing Artificial Force Fields for Autonomous Drones in Figure-eight Task using Reinforcement Learning
 \end{huge}
 
 \vspace{1.5cm}
@@ -65,10 +65,9 @@ July 28th, 2010
 %%%% Abstract %%%%
 \pagestyle{empty} % no page number
 \begin{abstract}
-abstract
 %todo
 \end{abstract}
-keywords
+%keywords
 \pagebreak
 
 %%%% Acknowledgments %%%%
@@ -85,73 +84,183 @@ keywords
 %%%% Introduction %%%%
 \setcounter{page}{2}
 \section{Introduction}
-%todo
+\label{sec:intro}
+
 % - problem sketch
 % - research question
+
+People seem to think that the goal of Artificial Intelligence is the creation of autonomous, intelligent robots. According to researchers in the field of robotics, it seems indeed to be the \emph{ultimate} goal. Although a lot of progress has been made in the last couple of decades, the ultimate goal still appears far from reached. Different sub-problems ask for different algorithms, and `the best' framework does not (yet) exists. In the course of time, a lot of algorithms have been invented and are investigated exhoustively, and some became part of the standard toolbox\footnote{As an example, the SLAM algorithm, for both mapping and localizing in unknown environments, is being used frequently}. Since there still are a lot of challenges, existing ideas are being shaped and new algorithms are being proposed, and tested on both existing and new problems.
+
+One challenge within robotics is the simple task of autonomous navigating towards a goal, without hitting obstacles. One of the proposed methods that try to solve this task uses artificial forces to guide the robot. The robot is attracted by the goal, while obstacles spread a repelling force. The approach works, but does not give an optimal path. This leads to the question whether the forces, which look like a good starting point, could be improved by learning.
+
+A well-known approach within robotics for learning is reinforcement learning. This semi-unsupervised learning methodology uses the intuitive notion of reward and punishment received from the environment to learn optimal actions for possible situations (i.e., locations within the environment). The objective of this thesis is to take the forces, or force field, as initial set up, and improve it using reinforcement learning. The improved force field should lead to better paths that cause the robot to move faster to the goal.
+
+The proposed method will be tested in the often-used Figure 8's challenge using an airial robotics platform. The objective of the Figure 8's challenge is to move in figure 8's around two poles. The tests will be used to gain insight in the benefits and possibly disadvantages of the proposed method.
 
 
 
 %%%% Motivation %%%%
-\section{Motivation}
-%todo
-% - robotics
-% - figure 8
+\subsection{Motivation}
+\label{sec:motivation}
 
+% - autonomous robotics more important
+% - drones cheaper, omnidirectional
+% - figure 8 (static environment)
+% - imav2011
+% - why robots
+
+Artificial force fields, often called Potential Field Methods (PFM) in the literature, are praised for their simplicity and elegance \cite{koren}. They are simple to set up and give reasonable results with no collisions if the parameters are set up correctly. The force fields are also computationally highly efficient as they only require some simple vector calculus on local obstacles. Furthermore, the physical analogy of a free-flying object makes it more appropriate for free-flying (omnidirectional) airial robots than for the ground robots the method is mostly used for \cite{burgard99}. % TODO: more citations
+
+The figure-eight challenge is a commonly used to test robotic navigation algorithms. % TODO: add citation
+It has been used frequently for both wheel-driven and walking ground robots, and in the last couple of years it is used for testing the navigation skills of airial robots too, principally Micro Air Vehicles (MAV's). For example, the figure-eight task is part of the yearly International Micro Air Vehicle (IMAV) Flight Competition\footnote{http://www.imav2011.org}. Using the results of the research on improved force fields presented in this thesis, we will participate in this year's IMAV `Pylon' indoor competition in September 2011, held in the Netherlands. A Parrot AR.Drone\footnote{http://ardrone.parrot.com} Quadcopter will be used as hardware platform. The AR.Drone is one of the first relatively cheap MAV's and comes with an Open Source API programming interface, making it an excellent tool for robotics research labs.
+
+The rest of the thesis is organised as follows. In the next section some related work will be discussed. In section 3, the used methodology is explained, followed by an explanation of the accomplished tests. The results will be shown in section 5 and discussed in section 6. The last section describes possible future research.
 
 
 %%%% Related Work %%%%
 \section{Related Work}
-%todo
+\label{sec:related}
+
+\subsection{Force Fields}
+
+% first suggested by Andrews and Hogan [1983], Khatib [1985]
+The idea of imaginary forces that act on a robot has first been suggested by Andrews and Hogan \cite{andrews83}. They introduce the idea of an attracting (positive) force towards the target and repelling (negative) forces nearby obstacles. The target is viewed as a point which exerts a constant force towards himself on all locations, while the obstacles exert a repelling force towards the robot inversely proportional to the distance between the obstacle and the robot.
+
+% extended by other researchers
+% i.e. to Virtual Force Field (obstacles are grids) and Vector Field Histogram by Borenstein
+% give formulas
+
+The force field framework, later on called \emph{Potential Field Methods} (PFM), was further investigated in the 90's by many researchers in the robotics area and became quite popular as obstacle avoidance method. For example, Koren and Borenstein \cite{koren89} developed the \emph{Virtual Force Field} (VFF) which discretizes the environment and uses a \emph{ertainty grid} to represent the certainty of finding an obstacle at each grid position. Obstacles can thus be unknown initially, but it is assumed that the location of both the robot and the goal is known.
+
+Two forces are being calculated in PFM: the attractive force $\vec{F}_t$, and the total repelling force $\vec{F}_r$. The resultant force vector is the sum of both: $\vec{R} = \vec{F}_t + \vec{F}_t$. The directioon determines the robot's steering-rate, which is a constant times the difference between the current and the desired direction. This is, of course, based on the idea of wheel-based robots; omnidirectional vehicles could simply proceed their path in the desired direction. The new direction is thus determined by the strength (length of vector) of the repelling forces relative to the attracting force constant $\gamma$. Note that the length is not important and a constant speed is used.
+
+The Virtual Force Field uses a \emph{Active Window} of grid cells nearby to calculate the vectors $\vec{F}_r$ and $\vec{F}_t$ as:
+  \[ \vec{F}_r = \sum_{c} F_{c} = \sum_{c} \frac{\delta}{d^n(c, r)} \frac{(\vec{P}_c - \vec{P}_r)}{ d(c, r) } \]
+and
+  \[ \vec{F}_t = \gamma \frac{(\vec{P}_t - \vec{P}_r)}{ d(t, r) } \]
+where $c$ stands for a cell, $r$ for the robot and $t$ for the target, $\delta$ is a value determined by a negative force constant, the certainty of an object being at cell $c$ and the size of the robot, $\gamma$ a target force constant, $\vec{P}$ the various positions, and $d(c, r)$ the distance between cell $c$ and the robot. Thus, the attracting target force has constant size and points towards the target, and the repelling force is the sum of all cells possibly containing an obstacle, inversely proportional to the distances to the robot. In practice, $n$ is often chosen to be $2$.
+
+More extensions have been proposed, such as the \emph{Vector Field Histogram} by Borenstein which calculates directions with a high concentration of free space, methods incorporating global path planning, and extensions to deal with motion dynamics at high speed movement \cite{burgard97}. This last extension uses a \emph{dynamic window approach} where the size of the active window is changed according to current speed and direction, to take into account the inertia of both the rotation and the translation. For omnidirectional robots such as quadcopters, the rotational inertia is not a problem, but the translation inertia could cause problems. However, when learning is involved, possibly wrong initial forces could be corrected. Another extension is the use of a variable attracting force determined by the distance, which could help avoiding the problem of local minima with can originate out of many obstacles near the goal \cite{ge00}.
+
+% Examples from applications (burgard @ museum, brooks [1986])
+The Potential Field Methods are reported to be succesful in practice \cite{brooks86, koren91, burgard99}, both in simulation and real-world application. Some limitations are described too \cite{koren91}, which are discussed in section \ref{sec:conclusion}. However, the most important objective of the proposed methods is avoiding obstacles, leaving room for more efficient paths. Hence, it is worth examining an alternative method.
+
+
+\subsection{Reinforcement Learning}
+A well-known method for learning and improving \emph{policies} is Reinforcement Learning \cite[p.51-82]{sutton98}. RL uses the intuitive idea of reward and punishment (or negative reward) that follow on actions of an agent. In learning methods concerning supervision, the best action possible will be told to the agent after acting in a certain situation. In practical problems, the best action is often not known, but a certain value of the resulting \emph{state} could be defined. In RL the \emph{reward} of different actions for different states is being used to update either the \emph{value function}, that determines the potential value of each state, or the \emph{policy}, that maps possible observed states to the best known actions. The \emph{reward function} thus defines the goal of the task being accomplished, without specifiing exactly \emph{how} the task will be accomplished. The goal of the Reinforcement Learning problem is to maximize the expected (average) total reward over time, called \emph{return}, so to maximize the following function \cite{kaebling96}:
+ \[ lim_{h \rightarrow \infty} E( \frac1h \sum_{t=0}^h r_t ) \]
+or, more often cited \cite{li-juan08}, to find the optimal policy $\pi^*$:
+ \[ \pi^* = argmax_{\pi} [ E( \sum_{t=0}^{\infty} \gamma^{t} r_t ) ] \]
+where $r_t$ is the immediate reward following the last action and determined by the current state, and $\gamma$ is some discount parameter to make the infinite sum finite. The interaction with the environment enables the agent to learn optimal actions for each state by choosing the action that has the largest expected return.
+
+Updating the agent's knowledge could be accomplished by using a method involving some form of temporal difference (TD) \cite[p.133-157]{sutton98}, which updates the value function, or a more exotic method such as an evolutionary algorithm (EA) \cite{li-juan08}, which updates the policy directly. 
+
+To use the knowledge learned from experience, as well as gather new knowledge, a trade-off between \emph{exploitation} and \emph{exploration} has to be made. In practice, often some percentage of the actions is chosen random and the remaining actions are determined by the value function or policy learned so far.
+
+\subsection{Combining Potential Fields and Reinforcement Learning}
+
+% example with maze and some reinforcement learning
+
+The Potential Force Method basically is a gradient descent search method directed towards minimizing the potential function. The potential function is defined by summing over the forces from goal to each point, with a slope towards the goal and hyperbolic hills around obstacles.
+
+
+An interesting idea using the gradient descent view of the PFM is proposed in \cite{li-juan08}, which is the only attempts known by us that tries to combine reinforcement learning and potential force fields. The potential field model as stated in the last paragraph shares some features with the reinforcement learning model. Using these similarities they redefined a maze problem, originally stated in a reinforcement learning model, as a potential field problem:
+
+\begin{itemize}
+ \item States with positive rewards become attractive sources
+ \item States with negative rewards become repulsive sources
+ \item Other states have no attractive or repulsive force
+\end{itemize}
+
+Using these two rules, a RL problem could be transformed into a PFM problem, in fact creating a path planning problem from a optimization problem. Using the proposed transition in \cite{li-juan08}, their maze problem consisting of a 25x28 state grid becomes a grid of objects excerting attracting or repelling forces with four possible directions (up, right, down, left). The optimal values are the optimal forces, or `heights' in the potential value landscape.
+
+This thesis will try to do the opposite transition, where a path planning problem is being optimized by reinforcement learning, although we will use a different approach without explicit transitions. 
+
+
+% TODO: nog goed kijken naar de overgang van deze sectie naar mijn werk
+
+
+%TODO: SCHRIJF IETS OVER TEMPORAL DIFFERENCE
 
 
 
 %%%% Method %%%%
 \section{Methodology}
+\label{sec:method}
+
 %todo
+
+\subsection{Figure-eight}
+% - field description
+% - stages
+% - transitions
+
 \subsection{Artificial Force Fields}
 % - initial fields
+% discretized (each vector is local sum of forces, so it is allowed to use local force only) as in certainty grid
+% no certainty grid
 
 \subsection{Reinforcement Learning}
 % - updating vectors
-
-\subsection{...}
 
 
 
 %%%% Practical Tests %%%%
 \section{Practical Tests}
+\label{sec:tests}
+
 %todo
+
+\subsection{Simple Simulation}
+
 \subsection{USARSim simulation}
 
 \subsection{IMAV2011 \& AR.Drone}
 
 
+
+% IMPLEMENTATION? if so, change end of motivation
+
+
+
 %%%% Results %%%%
 \section{Results}
+\label{sec:results}
+
 %todo
+% - images
+
 \subsection{Simple Simulation}
 
-\subsection{Unreal Simulation}
+\subsection{USARSim Simulation}
 
-\subsection{Real-World}
+%\subsection{Real-World}
 
 
 
 %%%% Conclusion / Discussion %%%%
 \section{Conclusion \& Discussion}
+\label{sec:conclusion}
 %todo
 
+% - limitations
+%   * trajectories between narrowly spaced obstacle
+%   * oscillations
+%   * inertia of robot (more speed = more problems; more air resistance = better)
 
 
 %%%% Future Work %%%%
 \section{Future Work}
+\label{sec:future}
 %todo
 
 
 
 %%%% Bibliography %%%%
-\section*{Bibliography}
 %todo
+\bibliographystyle{plain}
+\bibliography{Thesis}
+
 
 
 

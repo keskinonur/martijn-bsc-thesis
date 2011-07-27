@@ -1,16 +1,7 @@
-==============
-Bachelorthesis
-==============
+=====================
+Bachelorthesis Vragen
+=====================
 
-# Leren optimale pad.
-# Met Reinforcement learning.
+- goed in algemeen? missen dingen?
 
-# Leren parameters, of Leren path -> algemeen is handig
-
-# Kaart hebben, of maken?
-
-# Locatie bepalen, of hacks (FSA)
-
-# Literatuur
-
-
+- implementatie-sectie?
