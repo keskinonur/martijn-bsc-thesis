@@ -9,9 +9,9 @@
 .*.swp
 .*.mp4
 .*.pyc
-.*.pdf
 .*.sdf
 .*~
+Thesis.pdf
 src/others/robrecht/Examples/Linux/ATest/Build/Release/Movies/
 src/martijn/usarsim/ipch
 src/martijn/usarsim/ardrone_slam/x64
