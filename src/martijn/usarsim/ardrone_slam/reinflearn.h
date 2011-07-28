@@ -29,6 +29,13 @@ typedef struct rl_particle {
 	struct rl_particle *left;
 } rl_particle;
 
+typedef struct rl_history {
+	struct rl_particle *particle;
+	bool explore;
+	double explore_vect[2];
+	double speed[2];
+} rl_history;
+
 typedef struct rl_layout {
 	double width;
 	double height;
@@ -39,6 +46,7 @@ typedef struct rl_layout {
 	double coarse;
 	// reinf learn:
 	int history;
+	double epsilon; // probability for exploration
 } rl_layout;
 
 typedef struct rl_transition {
@@ -48,6 +56,12 @@ typedef struct rl_transition {
 } rl_transition;
 
 
+typedef struct rl_stats {
+	char *filename;
+	long last_transition;
+	long number_of_transitions;
+} rl_stats;
+
 
 class reinflearn
 {
@@ -55,6 +69,8 @@ public:
 	// vars
 	rl_stage *stage_curr;
 	rl_layout *layout;
+	rl_stats *stats;
+	rl_history *history[10]; // TODO: hard-coded for now
 	
 	// construct/destruct
 	reinflearn(bot_ardrone *bot);
@@ -68,8 +84,13 @@ public:
 	void control_set(int type, double velocity);
 	void fly_vector(double vect[2]);
 
+	// history
+	void history_clear();
+	void add_to_history(struct rl_particle *particle, bool explore);
+
 	// helper functions
 	long timestamp_millis();
+	void save_stats_to_file(struct rl_stats *stats);
 	
 //private:
 	

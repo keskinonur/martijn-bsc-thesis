@@ -18,6 +18,10 @@ public:
 	
 	// visualisations
 	void save_to_file(char *filename, double loc[2], struct rl_particle *part_last);
+	// restore
+	void save_field_to_file(char *filename, char *tmp);
+	void load_field_from_file(char *filename);
+
 
 };
 

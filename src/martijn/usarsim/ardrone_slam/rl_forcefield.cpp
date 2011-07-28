@@ -67,15 +67,15 @@ rl_particle *rl_forcefield::get_nearest_particle(double loc[2], rl_particle *sta
 
 
 // after stage transition we need to find the corresponding particle
-rl_particle *rl_forcefield::get_matching_particle(rl_particle *search)
+rl_particle *rl_forcefield::get_matching_particle(double x, double y)
 {
 	// find horizontal match
 	rl_particle *curr = &particles[0];
-	while(curr->loc[0] != search->loc[0]) {
+	while(curr->loc[0] != x) {
 		 curr = curr->right;
 	}
 	// find vertical match
-	while(curr->loc[1] != search->loc[1]) {
+	while(curr->loc[1] != y) {
 		curr = curr->bottom;
 	}
 	return curr;
