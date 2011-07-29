@@ -44,13 +44,25 @@ rl_particle *rl_forcefield::get_nearest_particle(double loc[2], rl_particle *sta
 	bool changed = true;
 	while (changed) {
 		changed = false;
+		/*
+		printf(" -- curr d: %f (%f %f - %f %f)\n", d, curr->loc[0], curr->loc[1], loc[0], loc[1]);
+		if (curr->top != NULL)
+			printf(" -- top  d: %f (%f %f - %f %f)\n", dist(loc, curr->top->loc), curr->top->loc[0], curr->top->loc[1], loc[0], loc[1]);
+		if (curr->right != NULL)
+			printf(" -- rgt  d: %f (%f %f - %f %f)\n", dist(loc, curr->right->loc), curr->right->loc[0], curr->right->loc[1], loc[0], loc[1]);
+		if (curr->bottom != NULL)
+			printf(" -- bot  d: %f (%f %f - %f %f)\n", dist(loc, curr->bottom->loc), curr->bottom->loc[0], curr->bottom->loc[1], loc[0], loc[1]);
+		if (curr->left != NULL)
+			printf(" -- lft  d: %f (%f %f - %f %f)\n", dist(loc, curr->left->loc), curr->left->loc[0], curr->left->loc[1], loc[0], loc[1]);
+		*/
+
 		if (curr->top != NULL && dist(loc, curr->top->loc) < d) {
 			d = dist(loc, curr->top->loc);
 			curr = curr->top;
 			changed = true;
 		} else if (curr->right != NULL && dist(loc, curr->right->loc) < d) {
 			d = dist(loc, curr->right->loc);
-			curr = start->right;
+			curr = curr->right;
 			changed = true;
 		} else if (curr->bottom != NULL && dist(loc, curr->bottom->loc) < d) {
 			d = dist(loc, curr->bottom->loc);
@@ -62,6 +74,7 @@ rl_particle *rl_forcefield::get_nearest_particle(double loc[2], rl_particle *sta
 			changed = true;
 		}
 	}
+
 	return curr;
 }
 
@@ -71,11 +84,11 @@ rl_particle *rl_forcefield::get_matching_particle(double x, double y)
 {
 	// find horizontal match
 	rl_particle *curr = &particles[0];
-	while(curr->loc[0] != x) {
+	while(curr->loc[0] < x) {
 		 curr = curr->right;
 	}
 	// find vertical match
-	while(curr->loc[1] != y) {
+	while(curr->loc[1] < y) {
 		curr = curr->bottom;
 	}
 	return curr;

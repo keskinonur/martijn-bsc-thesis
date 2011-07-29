@@ -43,10 +43,13 @@ typedef struct rl_layout {
 	double pylon1[2];
 	double pylon2[2];
 	double pylonr;
+	double ardroner;
 	double coarse;
 	// reinf learn:
 	int history;
 	double epsilon; // probability for exploration
+	double alpha;   // learning rate
+	double gamma;   // discount factor
 } rl_layout;
 
 typedef struct rl_transition {
@@ -70,7 +73,7 @@ public:
 	rl_stage *stage_curr;
 	rl_layout *layout;
 	rl_stats *stats;
-	rl_history *history[10]; // TODO: hard-coded for now
+	rl_history *history; // TODO: hard-coded for now
 	
 	// construct/destruct
 	reinflearn(bot_ardrone *bot);
@@ -86,12 +89,19 @@ public:
 
 	// history
 	void history_clear();
-	void add_to_history(struct rl_particle *particle, bool explore);
+	void add_to_history(struct rl_particle *particle, double dir_curr[2], bool explore);
+
+	// collisions
+	bool collision(double loc_curr[2]);
+	void move_away_from_obstacle(double loc_curr[2], double vect_fly[2]);
 
 	// helper functions
 	long timestamp_millis();
 	void save_stats_to_file(struct rl_stats *stats);
 	
-//private:
+	// reinforcement learning
+	void value_update(double loc_curr[2], double loc_last[2]);
+	void vector_update();
+	double reward(double loc_curr[2], double loc_last[2]);
 	
 };
