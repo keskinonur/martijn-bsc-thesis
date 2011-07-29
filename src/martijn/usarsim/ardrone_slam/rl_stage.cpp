@@ -20,7 +20,7 @@ void rl_stage::add_stage_transition(double v1[2], double v2[2], rl_stage *stage)
 	tr->stage = stage;
 }
 
-void rl_stage::save_to_file(char *filename, double loc[2], rl_particle *part_last) {
+void rl_stage::save_to_file(char *filename, double loc[2], rl_particle *part_last, double vect_fly[2]) {
 	/* Format:
 	 * - current location
 	 * - current force vector
@@ -31,12 +31,7 @@ void rl_stage::save_to_file(char *filename, double loc[2], rl_particle *part_las
 	ofstream fp;
 	fp.open(filename);
 	fp << loc[0] << " " << loc[1] << endl;
-	if (rl->history[0] != NULL && rl->history[0]->explore)
-		// explore
-		fp << part_last->loc[0] << " " << part_last->loc[1] << " " << rl->history[0]->explore_vect[0] << " " << rl->history[0]->explore_vect[1] << endl;
-	else
-		// exploit
-		fp << part_last->loc[0] << " " << part_last->loc[1] << " " << part_last->vect[0] << " " << part_last->vect[1] << endl;
+	fp << part_last->loc[0] << " " << part_last->loc[1] << " " << vect_fly[0]/8 << " " << vect_fly[1]/8 << endl;
 	for (int i=0; i<ff->particle_count; i++) {
 		fp << ff->particles[i].loc[0] << " ";
 		fp << ff->particles[i].loc[1] << " ";
@@ -72,14 +67,18 @@ void rl_stage::save_field_to_file(char *filename, char *tmp) {
 void rl_stage::load_field_from_file(char *file) {
 	double x, y, vx, vy, val;
 	x = y = vx = vy = val = 0;
-	rl_particle *part = &(ff->particles[0]);
+	int count = 0;
+	rl_particle *part;
 	string line;
 	ifstream fp (file);
 	if (fp.is_open()) {
-		while (fp.good()) {
+		while (fp.good() && count < ff->particle_count) {
+			part = &(ff->particles[count++]);
+
 			getline(fp, line);
-			sscanf(line.data(), "%f %f %f %f %f", &x, &y, &vx, &vy, &val);
-			part = ff->get_matching_particle(x, y);
+			sscanf(line.data(), "%lf %lf %lf %lf %lf", &x, &y, &vx, &vy, &val);
+
+			//part = ff->get_matching_particle(x, y);
 			part->vect[0] = vx;
 			part->vect[1] = vy;
 			part->val = val;

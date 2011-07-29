@@ -4,17 +4,19 @@
 // functions that return scalars
 
 double norm(double vect[2]) {
-	return dot(vect, vect);
+	return sqrt(dot(vect, vect));
 }
 
 double dot(double vect1[2], double vect2[2]) {
-	return sqrt(vect1[0] * vect2[0] + vect1[1] * vect2[1]);
+	return vect1[0] * vect2[0] + vect1[1] * vect2[1];
 }
 
 double dist(double vect1[2], double vect2[2]) {
-	double vect3[2];
+	/*double vect3[2];
 	diff(vect1, vect2, vect3);
 	return norm(vect3);
+	*/
+	return sqrt( (vect1[0]-vect2[0]) * (vect1[0]-vect2[0]) + (vect1[1]-vect2[1]) * (vect1[1]-vect2[1]) );
 }
 
 

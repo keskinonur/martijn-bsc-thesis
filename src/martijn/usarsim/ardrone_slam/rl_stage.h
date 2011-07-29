@@ -17,7 +17,7 @@ public:
 	bool check_for_stage_transition(double v1[2], double v2[2]);
 	
 	// visualisations
-	void save_to_file(char *filename, double loc[2], struct rl_particle *part_last);
+	void save_to_file(char *filename, double loc[2], struct rl_particle *part_last, double vect_fly[2]);
 	// restore
 	void save_field_to_file(char *filename, char *tmp);
 	void load_field_from_file(char *filename);
