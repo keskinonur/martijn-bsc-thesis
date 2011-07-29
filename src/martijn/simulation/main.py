@@ -63,6 +63,7 @@ def goaldirected_discrete(constant_speed=1, speed=1000, stepsize=0.5):
   spawn   = (20, 20)
   coarse  = 30
   history = 100
+  exploration = 0.2
   # open window
   sim = Simulation(width, height, spawn, coarse=coarse, history=history) 
   sim.constant_speed = constant_speed
@@ -109,6 +110,13 @@ def goaldirected_discrete(constant_speed=1, speed=1000, stepsize=0.5):
       else:
         sim.ardrone.move(stepsize)
       time.sleep(1/speed)
+      # spawn again if goal is reached
+      x, y = sim.ardrone.location
+      if x > 755 and y > 190 and y < 300:
+        sim.ardrone.location = spawn
+        sim.ardrone.speed = (0, 0)
+        sim.history = [None]*history
+
     except KeyboardInterrupt:
       print "\n\n    Stopped simulation program!"
       exit()
@@ -209,7 +217,7 @@ if __name__ == "__main__":
   stepsize = 1
   spawn = (int(width/2), int(height/4))
   coarse = 20         # pixels per coarse (for discrete simulations)
-  history = 2        # reinf learn: number of vectors to update
+  history = 10        # reinf learn: number of vectors to update
   exploration = 0.2   # reinf learn: chance for exploration move
   constant_speed = True
   file_watcher = False

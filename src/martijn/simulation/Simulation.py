@@ -87,6 +87,7 @@ class Simulation:
   # Problem specific: don't fly out of window
   def repair_location(self, loc_new, loc_old):
 
+    return
     if self.hit_object(loc_new, loc_old):
       # repair it
       self.ardrone.location = loc_old # TODO: this is too ugly
