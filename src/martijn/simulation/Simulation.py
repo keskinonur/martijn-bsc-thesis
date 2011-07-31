@@ -15,7 +15,7 @@ from ARDrone import *        # ARDrone object
 
 class Simulation:
 
-  def __init__(self, width, height, spawn, coarse=10, history=10):
+  def __init__(self, width, height, spawn, coarse=10, history=10, train=True):
     pygame.init()
     self.width  = width
     self.height = height
@@ -31,7 +31,10 @@ class Simulation:
     self.show_counter = 0
     # stats
     self.transition_count = 0
+    self.transitionstart = time.time()
+    self.train = train
     self.starttime = time.time()
+
 
 
 
@@ -54,10 +57,15 @@ class Simulation:
           # (ad x ab) > 0 and (ba x bc) > 0 and (cb x cd) > 0 and (dc x da) > 0, OR:
           # (ad x ab) < 0 and (ba x bc) < 0 and (cb x cd) < 0 and (dc x da) < 0
           if sign(a, b, c) == sign(b, c, d) == sign(c, d, a) == sign(d, a, b):
+            # Transition!
             self.stage = stage_to
-            self.transition_count += 1
-            #print ">> Transition: " + stage_from + " -> " + stage_to
+            if self.train: # increase only when training
+              self.transition_count += 1
+            self.save_stat()
+            self.transitionstart = time.time()
+            print ">> Transition "+str(self.transition_count)+": " + stage_from + " -> " + stage_to
             self.print_stats()
+            self.save_fields()
 
   def in_object(self, obj, loc):
     name, shape, width, color, coord1, coord2 = obj
@@ -87,11 +95,10 @@ class Simulation:
   # Problem specific: don't fly out of window
   def repair_location(self, loc_new, loc_old):
 
-    return
     if self.hit_object(loc_new, loc_old):
       # repair it
-      self.ardrone.location = loc_old # TODO: this is too ugly
-      self.ardrone.speed = (0,0)
+      #self.ardrone.location = loc_old # TODO: this is too ugly
+      #self.ardrone.speed = (0,0)
       # return it
       return True
     else:
@@ -158,10 +165,9 @@ class Simulation:
     curr_particle = self.get_nearest_particle(curr_location)
     if last_particle == None or curr_particle == None:
       print "AR.Drone possably out of sight. This is not good."
-      self.repair_location(curr_location, last_location)
       return
-    alpha = 0.4
-    gamma = 0.8
+    alpha = 0.2
+    gamma = 0.9
     # note: the order here is *important*, don't change!
     # check for state transition
     self.check_for_state_transition(curr_location, last_location)
@@ -169,11 +175,24 @@ class Simulation:
     collision = self.repair_location(curr_location, last_location)
     current_speed = self.ardrone.speed
     curr_location = self.ardrone.location
-    if not explore:
+
+    if self.history[0] == None \
+       or tuple(self.history[0][0:2]) == curr_particle:
+      dontupdate = True # only for new particles being used
+    else:
+      dontupdate = False
+
+    if not explore and not dontupdate:
+      # value update:
       curr_val, last_val = self.temp_diff(curr_location, last_location, \
-                              curr_particle, last_particle, collision, alpha, gamma)
+          curr_particle, last_particle, collision, alpha, gamma)
+      # vector update:
       self.update_particles(curr_val, last_val, current_speed, alpha)
     self.save_current_particle(curr_location, current_speed)
+    if collision:
+      # reset ardrone position
+      self.ardrone.respawn()
+      self.history = [None]*len(self.history)
 
   # update value of last location;
   # returns (curr_val, last_val)
@@ -190,11 +209,27 @@ class Simulation:
     # update state value
     ID = self.get_particle_id( (last_x,last_y), last_stage )
     new_val = (1 - alpha) * last_val + alpha * (reward + gamma * curr_val)
+
     if new_val > 1:
       print "MoreThanOneError:", (1 - alpha), last_val, alpha, (reward + gamma*curr_val)
     self.stages[last_stage].particles[ID] = (last_x, last_y, last_vect, new_val)
     return_val = (curr_val, new_val)
-    #print return_val
+
+    # update other values
+    for i in range(1, len(self.history)):
+      if self.history[i] == None:
+        break
+      last_x, last_y, last_stage, last_speed = self.history[i]
+      if last_stage != curr_stage:
+        break
+      ID = self.get_particle_id( (last_x,last_y), last_stage )
+      last_x, last_y, last_vect, last_val = self.stages[last_stage].particles[ID]
+      new_val = (1 - alpha) * last_val + alpha * (gamma * curr_val)
+      self.stages[last_stage].particles[ID] = (last_x, last_y, last_vect, new_val)
+      curr_val = last_val
+      
+      
+
     return return_val
 
   def reward(self, loc_new, loc_old, collision):
@@ -243,9 +278,7 @@ class Simulation:
       # weighted with time not seen (logarithmic)
       # > for alpha = 0.8 this is almost identical to:
       # > alpha * (1 - (1.0 / len(self.history)) * (i+1))
-      weight_dist = alpha * weight_dist
-      weight_td = his_val - old_val
-      weight = weight_dist * weight_td
+      weight = alpha * (his_val - old_val) / (i+1)
       his_norm = norm(his_speed)
       old_norm = norm(old_vect)
       #his_speed = unit(his_speed)
@@ -537,7 +570,39 @@ class Simulation:
       pygame.draw.line(self.scr, color, (x2, y2), line2, 1)
 
 
+  def save_stat(self):
+    duration = time.time() - self.transitionstart # in seconds
+    fp = open('backup_stats.txt', 'a')
+    fp.write(str(self.transition_count) + ': ' + str(duration) + '\n')
+    fp.close()
 
+  def save_fields(self):
+    for name in self.stages.keys():
+      field = self.stages[name]
+      fp = open('backup_'+name+'.txt', 'w')
+      for x, y, vect, val in field.particles:
+        fp.write(str(x)+' '+str(y)+' '+str(vect[0])+' '+str(vect[1])+' '+str(val)+'\n')
+      fp.close()
+    fp = open('backup_counters.txt', 'w')
+    fp.write('transition_count ' + str(self.transition_count) + '\n')
+    fp.close()
+
+  def load_fields(self):
+    for name in self.stages.keys():
+      fn = 'backup_'+name+'.txt'
+      if not os.path.exists(fn):
+        print "File does not exist: " + fn
+        exit()
+      fp = open(fn, 'r')
+      particles = [x.split() for x in fp.readlines()]
+      for x, y, vx, vy, val in particles:
+        self.stages[name].particles.append( (int(x),int(y),(float(vx),float(vy)),float(val)) )
+    fp = open('backup_counters.txt', 'r')
+    counters = [x.split() for x in fp.readlines()]
+    for name, value in counters:
+      if name == 'transition_count':
+        self.transition_count = int(value)
+    fp.close()
 
 
 

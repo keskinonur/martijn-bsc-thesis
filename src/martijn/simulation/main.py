@@ -10,9 +10,9 @@ from header import *
 # spawn: spawn location
 # speed: FPS, stepsize: nr of coarses per round
 def fig8_discrete(width, height, coarse, spawn, history, exploration, \
-                  constant_speed, speed=1000, stepsize=0.5):
+                  constant_speed, speed=1000, stepsize=0.5, restore=False, train=True):
   # open window
-  sim = Simulation(width, height, spawn, coarse=coarse, history=history) 
+  sim = Simulation(width, height, spawn, coarse=coarse, history=history, train=train) 
   sim.constant_speed = constant_speed
   center = ( int(width / 2), int(height / 2) )
   # make border
@@ -23,20 +23,24 @@ def fig8_discrete(width, height, coarse, spawn, history, exploration, \
   # add stages
   sim.add_stage('right_to_left')
   sim.add_stage('left_to_right')
-  sim.add_particles_uniform('all', coarse)
   # add stage transitions
   trans1 = ('line', (5, center[1]), (1*int(center[0]/2), center[1]))
   trans2 = ('line', (width-5, center[1]), (3*int(center[0]/2), center[1]))
   sim.add_stage_transition('right_to_left', 'left_to_right', trans1)
   sim.add_stage_transition('left_to_right', 'right_to_left', trans2)
   
-  # add forcefields for objects
-  #                         (  obj,   r, pwr)
-  sim.add_object_forcefields('all', 150, 20 )
-  
-  #                         ( stage,   object name,   r,pwr, ang)
-  sim.add_rounded_forcefield('all' , 'pylon_left' , 300, 30,  90)
-  sim.add_rounded_forcefield('all' , 'pylon_right', 300, 30, -90)
+  if restore:
+    # restore from files
+    sim.load_fields()
+  else:
+    sim.add_particles_uniform('all', coarse)
+    # add forcefields for objects
+    #                         (  obj,   r, pwr)
+    sim.add_object_forcefields('all', 150, 30 )
+    
+    #                         ( stage,   object name,   r,pwr, ang)
+    sim.add_rounded_forcefield('all' , 'pylon_left' , 300, 30,  90)
+    sim.add_rounded_forcefield('all' , 'pylon_right', 300, 30, -90)
   
   # draw
   while True:
@@ -44,18 +48,18 @@ def fig8_discrete(width, height, coarse, spawn, history, exploration, \
       sim.show()
       #sim.ardrone.theta += math.radians(5)
       if random.random() < exploration:
-        sim.ardrone.explore(stepsize, 2)
+        sim.ardrone.explore(stepsize, 4)
       else:
         sim.ardrone.move(stepsize)
       time.sleep(1/speed)
     except KeyboardInterrupt:
       print "\n\n    Stopped simulation program!"
       exit()
-    except:
-      print "Unexpected error:", sys.exc_info()
-      pygame.display.flip()
-      while True:
-        pass
+    #except:
+    #  print "Unexpected error:", sys.exc_info()
+    #  pygame.display.flip()
+    #  while True:
+    #    pass
 
 def goaldirected_discrete(constant_speed=1, speed=1000, stepsize=0.5):
   width   = 800
@@ -206,6 +210,8 @@ def usage(name):
   print " -c <int>: coarse (# pixels per coarse)"
   print " -o <int>: use contant speed (1 or 0)"
   print " -f: file_watcher: don't simulate but show particles from file"
+  print " -r: restore fields from backup files"
+  print " -e: exploit / test with field, do not use learning"
   exit()
 
 if __name__ == "__main__":
@@ -216,11 +222,13 @@ if __name__ == "__main__":
   speed = 10000
   stepsize = 1
   spawn = (int(width/2), int(height/4))
-  coarse = 20         # pixels per coarse (for discrete simulations)
+  coarse = 40         # pixels per coarse (for discrete simulations)
   history = 10        # reinf learn: number of vectors to update
-  exploration = 0.2   # reinf learn: chance for exploration move
+  exploration = 0.3   # reinf learn: chance for exploration move
   constant_speed = True
   file_watcher = False
+  restore = False
+  train = True
 
   # parse command line args
   i = 1
@@ -251,6 +259,11 @@ if __name__ == "__main__":
       constant_speed = bool(sys.argv[i])
     elif arg == "-f":
       file_watcher = True
+    elif arg == "-r":
+      restore = True
+    elif arg == "-e":
+      train = False
+      exploration = 0.0
     else:
       print arg
       usage(sys.argv[0])
@@ -266,6 +279,6 @@ if __name__ == "__main__":
     # play discrete simulation for figure-8's
     fig8_discrete(width, height, coarse, spawn, \
               history, exploration, constant_speed, \
-              speed, stepsize)
+              speed, stepsize, restore, train)
 
 
