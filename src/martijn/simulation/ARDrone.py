@@ -13,6 +13,7 @@ class ARDrone:
     self.maximum_speed = 30       # none or integer
     self.old_location = location
     self.simulation = simulation
+    self.spawn = location
 
 
   def draw(self, scr):
@@ -85,5 +86,10 @@ class ARDrone:
     # do reinforcement learning steps
     self.simulation.reinf_learn( self.location, self.old_location, (vx,vy), explore=True )
     
+
+  def respawn(self):
+    self.location = self.spawn
+    self.speed = (0, 0)
+    self.theta = 0
 
 

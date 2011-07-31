@@ -3,6 +3,7 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{subfigure}
+\usepackage{float}
 
 \usepackage{parskip}
 % same as: Dutch style of paragraph formatting, i.e. no indents. 
@@ -20,7 +21,7 @@
 \vspace{2.5cm}
 \begin{center}
 \begin{huge}
-Optimizing Artificial Force Fields for Autonomous Drones in Figure-eight Task using Reinforcement Learning
+Optimizing Artificial Force Fields for Autonomous Drones in the Pylon Challenge using Reinforcement Learning
 \end{huge}
 
 \vspace{0.5cm}
@@ -46,7 +47,7 @@ Martijn F.W. van der Veen
 \vspace{2.5cm}
 
 \begin{huge}
-Optimizing Artificial Force Fields for Autonomous Drones in Figure-eight Task using Reinforcement Learning
+Optimizing Artificial Force Fields for Autonomous Drones in the Pylon Challenge using Reinforcement Learning
 \end{huge}
 
 \vspace{1.5cm}
@@ -91,13 +92,13 @@ July 28th, 2010
 %%%% Abstract %%%%
 \thispagestyle{empty} % no page number
 \begin{abstract}
-The idea of imaginary forces acting on a robot has gained a lot of interest from robotics researchers in the nineties as useful and easy-to-set-up paradigm for navigation without collisions. However, the force field essentially is not optimal, leaving room for improvements. A common used method for learning optimal policies is Reinforcement Learning. This thesis tries to apply reinforcement learning to force fields in a way to improve the initial force field. The framework is applied, with some additional improvements, to the ``Figure-eight'' task using an aerial robot. Some interesting results follow from the (simulated) experiments, and the possibility of the proposed framework will be evaluated.
+The idea of imaginary forces acting on a robot has gained a lot of interest from robotics researchers in the nineties as useful and easy-to-set-up paradigm for navigation without collisions. However, the force field essentially is not optimal, leaving room for improvements. A common used method for learning optimal policies is Reinforcement Learning. This thesis tries to apply reinforcement learning to force fields in a way to improve the initial force field. The framework is applied, with some additional improvements, to the ``Figure-Eight'' task using an aerial robot. Some interesting results follow from the (simulated) experiments, and the possibility of the proposed framework will be evaluated.
 \end{abstract}
 
 \vspace{1cm}
 
 \textbf{keywords}: \\
-reinforcement learning, potential field methods, force fields, drones, imav2011
+reinforcement learning, potential field methods, force fields, figure-eight, drones, imav2011
 \pagebreak
 
 %%%% Acknowledgments %%%%
@@ -119,13 +120,13 @@ reinforcement learning, potential field methods, force fields, drones, imav2011
 % - problem sketch
 % - research question
 
-People seem to think that the goal of Artificial Intelligence is the creation of autonomous, intelligent robots. One could state that, at least in the field of robotics, it seems indeed to be the \emph{ultimate} goal. Although a lot of progress has been made in the last couple of decades, the ultimate goal still appears far from reached. Different sub-problems ask for different algorithms, and `the best' framework does not (yet) exists. In the course of time, a lot of algorithms have been invented and are investigated exhaustively, and some became part of the standard toolbox\footnote{As an example, the SLAM algorithm, for both mapping and localizing in unknown environments, is being used frequently}. Since there still are a lot of challenges, existing ideas are being shaped and new algorithms are being proposed, and tested on both existing and new problems.
+People seem to think that the goal of Artificial Intelligence is the creation of autonomous, intelligent robots. One could state that, at least in the field of robotics, it seems indeed to be the \emph{ultimate} goal. Although a lot of progress has been made in the last couple of decades, the ultimate goal still appears far from reached. Different sub-problems ask for different algorithms, and `the best' framework does not (yet) exists. In the course of time, a lot of algorithms have been invented and are investigated exhaustively, and some became part of the standard toolbox\footnote{As an example, the SLAM algorithm, for both mapping and localizing in unknown environments, is being used frequently; http://openslam.org}. Since there still are a lot of challenges, existing ideas are being shaped and new algorithms are being proposed, and tested on both existing and new problems.
 
-One challenge within robotics is the simple task of autonomous navigating towards a goal, without hitting obstacles. One of the proposed methods that try to solve this task uses artificial forces to guide the robot \cite{choset}[Ch.4]. The robot is attracted by the goal, while obstacles spread a repelling force. The approach works, but does not give an optimal path. This leads to the question whether the forces, which look like a good starting point, could be improved by learning.
+One challenge within robotics is the simple task of autonomous navigating towards a goal, without hitting obstacles. One of the proposed methods that try to solve this task uses artificial forces to guide the robot \cite{choset}. The robot is attracted by the goal, while obstacles spread a repelling force. The approach works, but does not give an optimal path. This leads to the question whether the forces, which look like a good starting point, could be improved by learning.
 
 A well-known approach within robotics for learning is reinforcement learning. This semi-unsupervised learning methodology uses the intuitive notion of reward and punishment received from the environment to learn optimal actions for possible situations (i.e., locations within the environment). The objective of this thesis is to take the forces, or force field, as initial set up, and improve it using reinforcement learning. The improved force field should lead to better paths that cause the robot to move faster to the goal.
 
-The proposed method will be tested in the often-used Figure 8's challenge using an aerial robotics platform. The objective of the Figure 8's challenge is to move in figure 8's around two poles. The tests will be used to gain insight in the benefits and possibly disadvantages of the proposed method.
+The proposed method will be tested in the often-used Figure-Eight (Pylon) challenge using an aerial robotics platform. The objective of the Figure-Eight challenge is to move in figure-eight's around two poles. The tests will be used to gain insight in the benefits and possibly disadvantages of the proposed method.
 
 
 
@@ -170,10 +171,10 @@ and
   \[ \vec{F}_t = \gamma \frac{(\vec{P}_t - \vec{P}_r)}{ d(t, r) } \]
 where $c$ stands for a cell, $r$ for the robot and $t$ for the target, $\delta$ is a value determined by a negative force constant, the certainty of an object being at cell $c$ and the size of the robot, $\gamma$ a target force constant, $\vec{P}$ the various positions, and $d(c, r)$ the distance between cell $c$ and the robot. Thus, the attracting target force has constant size and points towards the target, and the repelling force is the sum of all cells possibly containing an obstacle, inversely proportional to the distances to the robot. In practice, $n$ is often chosen to be $2$.
 
-More extensions have been proposed, such as the \emph{Vector Field Histogram} by Borenstein which calculates directions with a high concentration of free space, methods incorporating global path planning, and extensions to deal with motion dynamics at high speed movement \cite{burgard97}. This last extension uses a \emph{dynamic window approach} where the size of the active window is changed according to current speed and direction, to take into account the inertia of both the rotation and the translation. For omni-directional robots such as quad-copters, the rotational inertia is not a problem, but the translation inertia could cause problems. However, when learning is involved, possibly wrong initial forces could be corrected. Another extension is the use of a variable attracting force determined by the distance, which could help avoiding the problem of local minima with can originate out of many obstacles near the goal \cite{ge00}.
+More extensions have been proposed, such as the \emph{Vector Field Histogram} by Borenstein which calculates directions with a high concentration of free space, \emph{Navigation Fields} which are potential fields that do not have local minima but are difficult to create, methods incorporating global path planning, and extensions to deal with motion dynamics at high speed movement \cite{burgard97}. This last extension uses a \emph{dynamic window approach} where the size of the active window is changed according to current speed and direction, to take into account the inertia of both the rotation and the translation. For omni-directional robots such as quad-copters, the rotational inertia is not a problem, but the translation inertia could cause problems. However, when learning is involved, possibly wrong initial forces could be corrected. Another extension is the use of a variable attracting force determined by the distance, which could help avoiding the problem of local minima with can originate out of many obstacles near the goal \cite{ge00}.
 
 % Examples from applications (burgard @ museum, brooks [1986])
-The Potential Field Methods are reported to be successful in practice \cite{brooks86, koren91, burgard99}, both in simulation and real-world application. Some limitations are described too \cite{koren91}, which are discussed in section \ref{sec:conclusion}. Later on, more advanced methods were developed that are more proficient for small environments than Potential Field Methods, and the PFM became less used. For larger open areas such as in the ``Figure-eight'' task, PFM are still useful. Anyway, the most important objective of the proposed methods is avoiding obstacles, leaving room for more efficient paths. Hence, it is worth examining an adjustment of the potential field method.
+The Potential Field Methods are reported to be successful in practice \cite{brooks86, koren91, burgard99}, both in simulation and real-world application. Some limitations are described too \cite{koren91}, which are discussed in section \ref{sec:conclusion}. Later on, more advanced methods were developed that are more proficient for small environments than Potential Field Methods, and the PFM became less used. For larger open areas such as in the ``Figure-Eight'' task, PFM are still useful. Anyway, the most important objective of the proposed methods is avoiding obstacles, leaving room for more efficient paths. Hence, it is worth examining an adjustment of the potential field method.
 
 
 \subsection{Reinforcement Learning}
@@ -197,7 +198,7 @@ To use the knowledge learned from experience, as well as gather new knowledge, a
 
 The Potential Force Method basically is a gradient descent search method directed towards minimizing the potential function. The potential function is defined by summing over the forces from goal to each point, with a descending slope towards the goal and hyperbolic hills around obstacles.
 
-An interesting idea using the gradient descent view of the PFM is proposed in \cite{li-juan08}, which is the only paper known to us that claims to combine reinforcement learning and potential force fields in an elegant way. The potential field model as stated in the last paragraph shares some features with the reinforcement learning model. Using these similarities they redefined a maze problem, originally stated in a reinforcement learning model, as a potential field problem:
+An interesting idea using the gradient descent view of the PFM is proposed in \cite{li-juan08}, which is the only paper known to us that claims to combine reinforcement learning and potential force fields. The potential field model as stated in the last paragraph shares some features with the reinforcement learning model. Using these similarities they redefined a maze problem, originally stated in a reinforcement learning model, as a potential field problem:
 
 \begin{itemize}
  \item States with positive rewards become attractive sources
@@ -205,9 +206,9 @@ An interesting idea using the gradient descent view of the PFM is proposed in \c
  \item Other states have no attractive or repulsive force
 \end{itemize}
 
-Using these rules, they rewrite the RL problem, in fact creating a path planning problem from a optimization problem. Using the proposed transition in \cite{li-juan08}, their maze problem consisting of a 25x28 state grid becomes a grid of objects exerting attracting or repelling forces, used for direct reward. However, the precise method is not very clear from the paper.
+Using these rules, they rewrite the RL problem, in fact creating a path planning problem from a optimization problem. Applying the proposed transition in \cite{li-juan08}, their maze problem consisting of a 25x28 state grid becomes a grid of objects exerting attracting or repelling forces, used for direct reward. With the utility function representing the map given, they learn a policy to navigate through this map. The policy in their case consists of four discrete actions (North, West, South, East) for each grid point.
 
-This thesis will try to do the opposite transition, where a path planning problem is being optimized by reinforcement learning, although we will use a different approach without explicit transitions. The proposed ``figure-eight'' task will also use a big force field with omni-directional free-flight possibilities, instead of small corridors with discrete locations.
+In this thesis a policy is learned with continuous actions; the drone can fly in any direction and the optimal policy will consist of the optimal directions. The path planning problem is thus being optimized by reinforcement learning. The proposed ``Figure-Eight'' task will use a big force field with omni-directional free-flight possibilities, instead of small corridors with discrete locations.
 % note: artikel is zeer vaag over wat ze precies doen (sectie 3.2)
 
 % TODO: nog goed kijken naar de overgang van deze sectie naar mijn werk
@@ -220,7 +221,7 @@ This thesis will try to do the opposite transition, where a path planning proble
 
 %todo
 
-The objective of this thesis is to start with an initial potential field, which is best seen as a force field in this methodology. The initial force field set up, which is a reasonable point to start concerning navigation tasks, will be followed by improvements of the force field using a method based on the reinforcement learning method temporal difference. First will be explained the initial force field set up including necessary steps to prepare for the next step, which is the learning cycle, where experience in the environment containing the specified problem will make changes to the force field. Then this framework is viewed in context of the ``figure-eight'' problem, with some additional comments on how to incorporate the problem with the force fields.
+The objective of this thesis is to start with an initial potential field, which is best seen as a force field in this methodology. The initial force field set up, which is a reasonable point to start concerning navigation tasks, will be followed by improvements of the force field using a method based on the reinforcement learning method temporal difference. First will be explained the initial force field set up including necessary steps to prepare for the next step, which is the learning cycle, where experience in the environment containing the specified problem will make changes to the force field. Then this framework is viewed in context of the ``Figure-Eight'' problem, with some additional comments on how to incorporate the problem with the force fields.
 
 \subsection{Artificial Force Fields}
 % - initial fields
@@ -295,23 +296,23 @@ A history of the last $H$ used force vectors could be remembered and used to upd
 Using this history update faster learning could be obtained with less episodes needed for reasonable results.
 
 
-\subsection{Figure-eight}
+\subsection{Figure-Eight}
 
 % - field description
 % - static environment (but RL could solve changes, probably also extra forces when new objects are detected)
 % - 2D problem, but 3D should work since all theory uses vectors
-The goal of the Figure-eight task is to move in a figure-eight around two poles (figure \ref{fig:pylonchallenge}). The task occurs in a static environment and is essentially a 2D problem, although the used method should work equally well in 3D since general vectors are being used in all formulas. We will discuss some difficulties concerning the use of the framework we talked over until now, and show the steps being accomplished to define the ``figure-eight'' task into the framework.
+The goal of the Figure-Eight task is to move in a Figure-Eight around two poles (figure \ref{fig:pylonchallenge}). The task occurs in a static environment and is essentially a 2D problem, although the used method should work equally well in 3D since general vectors are being used in all formulas. We will discuss some difficulties concerning the use of the framework we talked over until now, and show the steps being accomplished to define the ``Figure-Eight'' task into the framework.
 
   \begin{figure}
     \includegraphics[width=1.0\textwidth]{img/imav2011_pylon}
-    \caption{Figure-eight pylon challenge}
+    \caption{Figure-Eight pylon challenge}
     \label{fig:pylonchallenge}
   \end{figure}
 
 \paragraph{Force Fields}
 % - stages
 % - transitions
-One difficulties in using a potential field for the ``Figure-eight'' task is the continue characteristic of the latter, which makes defining a clear target location difficult. Another one is the center of the field (between the two poles), which sometimes needs to be passed in one direction and other times in the other direction. Both difficulties are solved by introducing two different \emph{stages}, one for `left to right' and one for `right to left'. Each stage has its own stage \emph{transition} which is defined as passing the line through both poles at the outside of the corresponding pole (right or left). Each stage has its own force field too, enabling the robot to learn different forces for the same locations, depending on the current location of the target line.
+One difficulties in using a potential field for the ``Figure-Eight'' task is the continue characteristic of the latter, which makes defining a clear target location difficult. Another one is the center of the field (between the two poles), which sometimes needs to be passed in one direction and other times in the other direction. Both difficulties are solved by introducing two different \emph{stages}, one for `left to right' and one for `right to left'. Each stage has its own stage \emph{transition} which is defined as passing the line through both poles at the outside of the corresponding pole (right or left). Each stage has its own force field too, enabling the robot to learn different forces for the same locations, depending on the current location of the target line.
 
 \paragraph{Reinforcement Learning}
 % - RL
@@ -324,10 +325,14 @@ The reward function returns 1 for a state transition and -1 for a collision. The
 \label{sec:tests}
 
 \subsection{Simple Simulation}
-A simple simulation has been used to view the influence of both different parameters for the algorithm and physics of the environment. Due to the simplicity, aspects of the environment could be changed very quick, although this advantage was at the expense of realistic physics. For example, the simulation updates the speed of the drone by adding the nearest speed vector to the current speed and decreasing the speed over time. Different set ups have been tested, with different results.
+A simple simulation has been used to view the influence of both different parameters for the algorithm and physics of the environment. Due to the simplicity, aspects of the environment could be changed very quick, although this advantage was at the expense of realistic physics. For example, the simulation updates the speed of the drone by adding the nearest speed vector to the current speed and decreasing the speed over time. Different setups have been tested, with different results. First will be shown a general goal finding task with initial force field, then we will switch to the ``Figure-Eight'' task for which different parameter values were tested on-the-fly and interesting results will be shown for reasonable (but not necessarily optimal) parameter combinations.
 
 \subsection{USARSim simulation}
-The USARSim environment, based on the Unreal Tournament engine, is a robot simulation environment and used extensively as research tool\footnote{http://sourceforge.net/projects/usarsim/}. The Parrot AR.Drone is ported to USARSim by Nick Dijkshoorn and Carsten van Weelden \cite{nick}. Comparison of the simulation and real AR.Drones shows rather good similarity. A virtual 3D model of a gym containing two pylons is built and used as environment for the simulated drone. A screenshot of the gym is show in figure \ref{fig:gym}.
+The USARSim environment, based on the Unreal Tournament engine, is a robot simulation environment and used extensively as research tool\footnote{http://sourceforge.net/projects/usarsim/}. The Parrot AR.Drone is ported to USARSim by Nick Dijkshoorn and Carsten van Weelden. Comparison of the simulation and real AR.Drones shows rather good similarity \cite{nick}. The physics of the simulation are realistic for both the motions and the sensors. For example, the lighting is realistic enough to use the virtual camera on the AR.Drone as simulation of the real-world camera input.
+
+In this thesis, the USARSim environment is used mostly for more realistic physics (i.e., inertia) compared to the simple simulation. At the sensor part, a virtual sensor detects collisions and another sensor presents the location (ground truth); however the camera is currently not being used. Using the camera it would be possible to detect the poles and other obstacles using SLAM or other landmark-based localization or detection systems.
+
+A virtual 3D model of a gym containing two pylons is built and used as environment for the simulated drone. A screenshot of the gym is show in Figure \ref{fig:gym}.
 
   \begin{figure}
     \includegraphics[width=1.0\textwidth]{img/gym}
@@ -342,6 +347,7 @@ Based on the USARSim simulation it is expected to be relatively easy to switch t
 
 
 %%%% Results %%%%
+\pagebreak
 \section{Results}
 \label{sec:results}
 
@@ -354,17 +360,17 @@ The results of force fields are best shown in figures. Interesting aspects will 
 
 A classical example of a field with one goal position and some obstacles was shown in figure \ref{fig:goal_directed} (section \ref{sec:method}). Five circle-shaped obstacles were created with two different radii. All have a (quadratic inversely proportional) repelling force, some have a rotational bias. The goal has a attractive force which is of constant length. The drone is released on random locations not containing an object. In the initial force field shown in the figure, all release locations result in the drone finding the goal. Changing the strength of the different force setting does not really matter for this result as long as no local minima are being created. These could only occur if two repelling forces and the goal-directed force sum to a vector pointing, which could be the case depending on the relative strength of the attracting and repelling forces, as well as the density of the objects.
 
-For the ``figure-eight'' task two circle-shaped obstacles are created (the pylons) and a rectangular-shaped obstacle is used for the walls. Repelling forces are added, as well as a rotational bias for both pylons (one clockwise and one anti-clockwise) to prevent the drone from passing the pylon at the wrong side (flying ``figure-zeros''). Apparently no attracting force is needed and the drone starts flying figure-eights as soon as it is released somewhere in the force field. Shown in figure \ref{fig:simple_init} is the initial force field with the yellow colored force vectors used in the first run.
+For the ``Figure-Eight'' task two circle-shaped obstacles are created (the pylons) and a rectangular-shaped obstacle is used for the walls. Repelling forces are added, as well as a rotational bias for both pylons (one clockwise and one anti-clockwise) to prevent the drone from passing the pylon at the wrong side (flying ``Figure-Zeros''). Apparently no attracting force is needed and the drone starts flying figure-eights as soon as it is released somewhere in the force field. Shown in figure \ref{fig:simple_init} is the initial force field with the yellow colored force vectors used in the first run.
 
   \begin{figure}
     \begin{center}
     \includegraphics[width=0.9\textwidth]{img/sim_init}
-    \caption{Figure-eight initial force field (simple simulation)}
+    \caption{Figure-Eight initial force field (simple simulation)}
     \label{fig:simple_init}
     \end{center}
   \end{figure}
 
-A typical result of the reinforcement learning algorithm applied to the initial force field is shown in figures \ref{fig:sim_l2r} and \ref{fig:sim_r2l}. For the learning part, $\gamma = 0.9$, $\alpha = 0.2$, $\epsilon = 0.3$, $H = 10$, 1200 force vectors are used and 250 stage transitions were made (making 125 figure-eights). A constant speed caused the vectors getting equal length. Following the vectors shows a shorter and thus improved path nearby the pylons\footnote{At the time these results were saved, the simple simulation did not incorporated the size of the AR.Drone, therefore the force field vectors allow for paths at small distances from the pylons}, while still containing trained vectors in wider paths which were reached due to exploration.
+A typical result of the reinforcement learning algorithm applied to the initial force field is shown in figures \ref{fig:sim_l2r} and \ref{fig:sim_r2l}. For the learning part, $\gamma = 0.6$, $\alpha = 0.4$, $\epsilon = 0.3$, $H = 10$, 1200 force vectors are used and 250 stage transitions were made (making 125 figure-eights). A constant speed caused the vectors getting equal length. Following the vectors shows a shorter and thus improved path nearby the pylons\footnote{At the time these results were saved, the simple simulation did not incorporated the size of the AR.Drone, therefore the force field vectors allow for paths at small distances from the pylons}, while still containing trained vectors in wider paths which were reached due to exploration.
 
 The (potential) values for the force vectors are shown as the vector color, with colors ranging from light blue for expected return 1 to light purple for expected return -1.
 
@@ -381,8 +387,33 @@ The (potential) values for the force vectors are shown as the vector color, with
    \label{fig:sim_r2l}
  }
 
-\caption{Figure-eight after 250 stage transitions (simple simulation)}
+\caption{Figure-Eight after 250 stage transitions (simple simulation)}
 \end{figure}
+
+
+To test whether there actually is improvement in round time another simulation is run with the (more common) parameter values $\gamma = 0.9$ and $\alpha = 0.2$ (resulting in less extreme vector improvements per round). During learning the time is measured between two stage transitions with a total of 600 transitions (thus 300 figure-eight's). After each one hundred stages of learning, the update algorithm is paused and a test of 40 stages (20 figure-eight's) is executed. For each of seven tests the mean duration of a stage is calculated. The stage durations during learning are shown in figure \ref{fig:learning_curve}; the means with the standard deviation are shown in table \ref{tab:means}.
+
+  \begin{figure}[H]
+    \begin{center}
+    \includegraphics[width=1\textwidth]{img/learning_curve}
+    \caption{Learning curve (durations of stages during learning)}
+    \label{fig:learning_curve}
+    \end{center}
+  \end{figure}
+
+\begin{center}
+ \begin{tabular}{ l | l | l }
+ \textbf{Training stages} & \textbf{Duration (mean)} & \textbf{Standard deviation} \\ \hline
+   0    & 4.330 & 0.0090 \\
+ 100    & 3.759 & 0.0261 \\
+ 200    & 3.442 & 0.0080 \\
+ 300    & 3.525 & 0.1545 \\
+ 400    & 3.013 & 0.0528 \\
+ 500    & 2.985 & 0.0723 \\
+ 600    & 2.876 & 0.1049
+ \label{tab:means}
+ \end{tabular}
+\end{center}
 
 
 \subsection{USARSim Simulation}
@@ -431,9 +462,13 @@ First of all it seems the (potential) values of the vectors are plausible and, a
 
 However, before the vectors update to a smooth vector field, a lot of trials must be made. Some irregularities arise as long as the values are not settled to a stable landscape. Using a constant speed ends in vectors with equal length, while a variable speed gives vectors with variable length; some longer and thus causing areas with fast moving and areas with slow moving.
 
+The duration tests of figure-eight flights during learning as shown in figure \ref{fig:learning_curve} show a slowly descending curve. The algorithm seems to have a relatively big improvement at the start. The peeks at the very beginning are caused by the AR.Drone flying an extra circle around the `current' pole, which seems to stop after 25 trials. After one hundred trials learning seems to progress slowly during the rest of the simulation. To test for significant improvement, 40 tests are done after each 100 next learning trials. The mean and standard deviation are shown in table \ref{tab:means}. They show a descending trend too with multiple times the standard deviation in decrease each next test. The only increase in duration has a standard deviation that is more than the increase. Thus, it seems plausible to state that the learning algorithm as presented in this thesis indeed improves the path of a drone in the ``Figure-Eight'' task.
+
 In the USARSim result, some vectors are updated and some are almost untouched. The values are not yet settled and some temporal differences cause vectors to adapt very fast to the current speed. Before locations where the robot will get a negative reward due to a collision, strong vectors originate trying to change the path of the robot.
 
 An interesting structure occurs on the stage transition (figure \ref{fig:usarsim_transition}). Passing the transition seems to be save somewhere left from the center, where the probability of hitting the wall or the pole is small. Therefore all the (strong and positive rewarded) force vectors in front of the transition point in roughly the same direction, which may be interpret as a point on the optimal path. Although experiments with a lot more trials are only shown from the simple simulation (which could be accelerated), it is likely, but not guaranteed, to converge to a smooth vector field with better paths.
+
+Although the improvement was only shown statistically in the simulation with simple (inertia) physics, the similarity suggests that the results apply for the USARSim simulation too.
 
 
 
@@ -446,7 +481,7 @@ Future Research could focus on two different aspects.
 \paragraph{Localization}
 % - transition to real-world (direct location with slam+map without scale, big map without scale, relevant features such as distance to pylon (not visualizable) for which initial field could be set)
 
-The force field contains force vectors on different locations and needs to know which force vector to use at each moment. In the simulations we used the absolute position, but in real life we don't know this position that certain. A transition has to be made to this uncertain world. For localization it may be enough to use a map of the floor. Since the whole level is in a static, known environment, it is reasonable to presume it possible to present a floor map to the robot. Alternatively this map could be made by the robot by stitching together floor snapshots. Another possibility is the use of an algorithm based on SLAM, with the poles as obvious landmarks. Scale is not relevant, as long as the mapping from the map to the vectors is possible.
+The force field contains force vectors on different locations and needs to know which force vector to use at each moment. In the simulations we used the absolute position, but in real life we don't know this position that certain. A transition has to be made to this uncertain world. For localization it may be enough to use a map of the floor. Since the whole level is in a static, known environment, it is reasonable to presume it possible to present a floor map to the robot. Alternatively this map could be made by the robot by stitching together floor snapshots. In \cite{nick} it is shown that a reasonable visual floor map could be created using the AR.Drone if enough texture is present. Another possibility is the use of an algorithm based on SLAM, with the poles as obvious landmarks. Scale is not relevant, as long as the mapping from the map to the vectors is possible.
 
 Another option is using features from sensors like cameras or sonar as abstract input for the state representation, which replaces the location representation. For example, the width of the nearest pole could be enough to both set a reasonable initial force and learn a better force vector identified by that feature.
 

@@ -13,7 +13,7 @@ def norm(vect):
 def unit(vect):
   vect_norm = norm(vect)
   if vect_norm == 0:
-    return None # is scalar in GA
+    return (0,0) # is scalar in GA
   else:
     return ( float(vect[0]) / vect_norm, float(vect[1]) / vect_norm )
 
