@@ -316,7 +316,7 @@ One difficulties in using a potential field for the ``Figure-Eight'' task is the
 
 \paragraph{Reinforcement Learning}
 % - RL
-The reward function returns 1 for a state transition and -1 for a collision. The reinforcement learning occurs within stages and is restarted after a transition, as a result of which the values fall from almost 1 to possibly lower than 0 without getting problems with these large negative temporal differences. Hundreds of runs (exact number depends on the number of force vectors) will then change the force fields by using the value and vector update rules.
+The reward function returns 1 for a state transition and -1 for a collision. The reinforcement learning occurs within stages and is restarted after a transition, as a result of which the values fall from almost 1 to possibly lower than 0 without getting problems with these large negative temporal differences. Repeated training runs\footnote{The number of runs needed for round time improvements depend on the number of force vectors, the parameter settings and the desired amount of improvement; for example, the Results section shows round times of 66\% of the original time after 300 figure-eight's of training and conservative parameter values.} will then change the force fields by using the value and vector update rules.
 
 
 
@@ -330,7 +330,7 @@ A simple simulation has been used to view the influence of both different parame
 \subsection{USARSim simulation}
 The USARSim environment, based on the Unreal Tournament engine, is a robot simulation environment and used extensively as research tool\footnote{http://sourceforge.net/projects/usarsim/}. The Parrot AR.Drone is ported to USARSim by Nick Dijkshoorn and Carsten van Weelden. Comparison of the simulation and real AR.Drones shows rather good similarity \cite{nick}. The physics of the simulation are realistic for both the motions and the sensors. For example, the lighting is realistic enough to use the virtual camera on the AR.Drone as simulation of the real-world camera input.
 
-In this thesis, the USARSim environment is used mostly for more realistic physics (i.e., inertia) compared to the simple simulation. At the sensor part, a virtual sensor detects collisions and another sensor presents the location (ground truth); however the camera is currently not being used. Using the camera it would be possible to detect the poles and other obstacles using SLAM or other landmark-based localization or detection systems.
+In this thesis, the USARSim environment is used mostly for more realistic physics (i.e., inertia) compared to the simple simulation. At the sensor part, a virtual sensor detects collisions and another sensor presents the location (ground truth); however the camera is currently not being used. Using the camera it would be possible to detect the poles and other obstacles using SLAM (using for instance disparity maps \cite{robrecht}) or other landmark-based localization or detection systems.
 
 A virtual 3D model of a gym containing two pylons is built and used as environment for the simulated drone. A screenshot of the gym is show in Figure \ref{fig:gym}.
 
@@ -342,7 +342,7 @@ A virtual 3D model of a gym containing two pylons is built and used as environme
 
 
 \subsection{IMAV2011 \& AR.Drone}
-Based on the USARSim simulation it is expected to be relatively easy to switch to a real gym and use the force fields learned so far in simulation to guide a real AR.Drone. A non-trivial step is however the localization, since the simulation uses the absolute location (\emph{Ground Truth}) which is not present in real-life. This transition will be necessary for participation to the IMAV2011 competition, but is not discussed in this thesis.
+Based on the USARSim simulation it is expected to be relatively easy to switch to a real gym and use the force fields learned so far in simulation to guide a real AR.Drone. A non-trivial step is however the localization \cite{nick}, since the simulation uses the absolute location (\emph{Ground Truth}) which is not present in real-life. This transition will be necessary for participation to the IMAV2011 competition, but is not discussed in this thesis.
 
 
 
@@ -358,7 +358,7 @@ The results of force fields are best shown in figures. Interesting aspects will 
 
 \subsection{Simple Simulation}
 
-A classical example of a field with one goal position and some obstacles was shown in figure \ref{fig:goal_directed} (section \ref{sec:method}). Five circle-shaped obstacles were created with two different radii. All have a (quadratic inversely proportional) repelling force, some have a rotational bias. The goal has a attractive force which is of constant length. The drone is released on random locations not containing an object. In the initial force field shown in the figure, all release locations result in the drone finding the goal. Changing the strength of the different force setting does not really matter for this result as long as no local minima are being created. These could only occur if two repelling forces and the goal-directed force sum to a vector pointing, which could be the case depending on the relative strength of the attracting and repelling forces, as well as the density of the objects.
+A classical example of a field with one goal position and some obstacles was shown in figure \ref{fig:goal_directed} (section \ref{sec:method}). Five circle-shaped obstacles were created with two different radii. All have a (quadratic inversely proportional) repelling force, some have a rotational bias. The goal has a attractive force which is of constant length. The drone is released on random locations not containing an object. In the initial force field shown in the figure, one hundred randomly chosen locations (not inside objects) result in the drone finding the goal. Changing the strength of the different force setting does not really matter for this result as long as no local minima are being created. These could only occur if two repelling forces and the goal-directed force sum to a vector pointing, which could be the case depending on the relative strength of the attracting and repelling forces, as well as the density of the objects.
 
 For the ``Figure-Eight'' task two circle-shaped obstacles are created (the pylons) and a rectangular-shaped obstacle is used for the walls. Repelling forces are added, as well as a rotational bias for both pylons (one clockwise and one anti-clockwise) to prevent the drone from passing the pylon at the wrong side (flying ``Figure-Zeros''). Apparently no attracting force is needed and the drone starts flying figure-eights as soon as it is released somewhere in the force field. Shown in figure \ref{fig:simple_init} is the initial force field with the yellow colored force vectors used in the first run.
 
@@ -369,6 +369,8 @@ For the ``Figure-Eight'' task two circle-shaped obstacles are created (the pylon
     \label{fig:simple_init}
     \end{center}
   \end{figure}
+
+After the initial force field is set, the drone is released at the center of the figure-eight. The drone then flies continuously figure-eights. When an object is hit, the drone is restored at it's original starting point with zero speed.
 
 A typical result of the reinforcement learning algorithm applied to the initial force field is shown in figures \ref{fig:sim_l2r} and \ref{fig:sim_r2l}. For the learning part, $\gamma = 0.6$, $\alpha = 0.4$, $\epsilon = 0.3$, $H = 10$, 1200 force vectors are used and 250 stage transitions were made (making 125 figure-eights). A constant speed caused the vectors getting equal length. Following the vectors shows a shorter and thus improved path nearby the pylons\footnote{At the time these results were saved, the simple simulation did not incorporated the size of the AR.Drone, therefore the force field vectors allow for paths at small distances from the pylons}, while still containing trained vectors in wider paths which were reached due to exploration.
 
@@ -391,7 +393,9 @@ The (potential) values for the force vectors are shown as the vector color, with
 \end{figure}
 
 
-To test whether there actually is improvement in round time another simulation is run with the (more common) parameter values $\gamma = 0.9$ and $\alpha = 0.2$ (resulting in less extreme vector improvements per round). During learning the time is measured between two stage transitions with a total of 600 transitions (thus 300 figure-eight's). After each one hundred stages of learning, the update algorithm is paused and a test of 40 stages (20 figure-eight's) is executed. For each of seven tests the mean duration of a stage is calculated. The stage durations during learning are shown in figure \ref{fig:learning_curve}; the means with the standard deviation are shown in table \ref{tab:means}.
+To test whether there actually is improvement in round time another simulation is run with the (more common) parameter values $\gamma = 0.9$ and $\alpha = 0.2$ (resulting in less extreme vector improvements per round). During learning the time is measured between two stage transitions with a total of 600 transitions (thus 300 figure-eight's). After each one hundred stages of learning, the update algorithm is paused and a test of 40 stages (20 figure-eight's) without exploration is executed. For each of seven tests the mean duration of a stage is calculated. The stage durations during learning are shown in figure \ref{fig:learning_curve} (the test runs are thus not shown); the means with the standard deviation of the 40 test runs (which where thus independent of the learning trials) are shown in table \ref{tab:means}.
+
+The algorithm seems to have a relatively big improvement at the start. The peeks in figure \ref{fig:learning_curve} at the very beginning are caused by the AR.Drone flying an extra circle around the `current' pole, which seems to stop after 25 trials. After one hundred trials learning seems to progress slowly during the rest of the simulation.
 
   \begin{figure}[H]
     \begin{center}
@@ -420,7 +424,10 @@ To test whether there actually is improvement in round time another simulation i
 
 In addition to the initial force field that is set in the simple simulation, an attracting force towards the `other pole' is set to prevent the drone from circle movements around a pole. In the simple simulation this was not necessary due to a stronger inertia effect, which was too high compared to the USARSim physics.
 
-For the USARSim simulation shown in figure \ref{fig:usarsim_result1} no constant speed is set and $H = 3$, thus updating the last three vectors only, after just 40 stage transitions. This results in a less smoother field with nevertheless an interesting structure. One of the interesting structures that originates is the force field on the stage transition line (`finish line'), shown in figure \ref{fig:usarsim_transition}. Repeated runs result in similar force fields after 40 stage transitions.
+For the USARSim simulation shown in figure \ref{fig:usarsim_result1} no constant speed is set and $H = 3$, thus updating the last three vectors only, after just 40 stage transitions. This results in a less smoother field with nevertheless interesting parts. One of the interesting structures that originates is the force field on the stage transition line (`finish line'), shown in figure \ref{fig:usarsim_transition}. Passing the transition seems to be save somewhere left from the center, where the probability of hitting the wall or the pole is small. Therefore all the (strong and positive rewarded) force vectors in front of the transition point in roughly the same direction, which may be interpret as a point on the optimal path. Repeated runs result in similar force fields after 40 stage transitions.
+
+Some vectors are updated and some are almost untouched. The values are not yet settled and some temporal differences cause vectors to adapt very fast to the current speed. Before locations where the robot will get a negative reward due to a collision (i.e., next to a wall or a pylon), strong vectors originate trying to change the path of the robot.
+
 
   \begin{figure}
     \includegraphics[width=1.0\textwidth]{img/usarsim_result1}
@@ -447,7 +454,7 @@ For the USARSim simulation shown in figure \ref{fig:usarsim_result1} no constant
 \section{Conclusion \& Discussion}
 \label{sec:conclusion}
 
-The initial force fields set by adding a repelling force for the obstacles, an attracting force towards the goal and possibly some bias forces do quite a good job in leading a robot to a goal without collisions. The precise parameter values do not seem to have much impact on the goal-finding ability for the robot. However, the path is not optimal and improving the initial field could (theoretically) solve some well-known limitations\cite{koren91} of the Potential field method:
+The initial force fields set by adding a repelling force for the obstacles, an attracting force towards the goal and possibly some bias forces do quite a good job in leading a robot to a goal without collisions. The precise parameter values do not seem to have much impact on the goal-finding ability of the robot. However, the path is not optimal and improving the initial field could (theoretically) solve some well-known limitations\cite{koren91} of the Potential field method:
 
 \begin{itemize}
  \item \textbf{Local minima problem} and the inability to \textbf{navigate between narrowly spaced obstacles}, which could both be solved by using exploration to find out the best way out and updating the force vectors
@@ -460,15 +467,11 @@ The improved force fields show some interesting characteristics, which we will d
 
 First of all it seems the (potential) values of the vectors are plausible and, after more than a hundred figure-eights, cause a smooth landscape of hills on state transitions and valleys around walls. The values could be updates even faster by using the history of visited vectors and corresponding speed vectors and immediate reward values.
 
-However, before the vectors update to a smooth vector field, a lot of trials must be made. Some irregularities arise as long as the values are not settled to a stable landscape. Using a constant speed ends in vectors with equal length, while a variable speed gives vectors with variable length; some longer and thus causing areas with fast moving and areas with slow moving.
+However, before the vectors update to a smooth vector field, hundreds of trials must be made, making the availability of a simulation environment a pre. Some irregularities arise as long as the values are not settled to a stable landscape. Using a constant speed ends in vectors with equal length, while a variable speed gives vectors with variable length; some longer and thus causing areas with fast moving and areas with slow moving.
 
-The duration tests of figure-eight flights during learning as shown in figure \ref{fig:learning_curve} show a slowly descending curve. The algorithm seems to have a relatively big improvement at the start. The peeks at the very beginning are caused by the AR.Drone flying an extra circle around the `current' pole, which seems to stop after 25 trials. After one hundred trials learning seems to progress slowly during the rest of the simulation. To test for significant improvement, 40 tests are done after each 100 next learning trials. The mean and standard deviation are shown in table \ref{tab:means}. They show a descending trend too with multiple times the standard deviation in decrease each next test. The only increase in duration has a standard deviation that is more than the increase. Thus, it seems plausible to state that the learning algorithm as presented in this thesis indeed improves the path of a drone in the ``Figure-Eight'' task.
+The duration tests of figure-eight flights during learning as shown in figure \ref{fig:learning_curve} show a slowly descending curve. The tests executed between the learning sessions show a descending trend too with multiple times the standard deviation in decrease each next test. The only increase in duration has a standard deviation that is more than the increase. Thus, it seems plausible to state that the learning algorithm as presented in this thesis indeed improves the path of a drone in the ``Figure-Eight'' task.
 
-In the USARSim result, some vectors are updated and some are almost untouched. The values are not yet settled and some temporal differences cause vectors to adapt very fast to the current speed. Before locations where the robot will get a negative reward due to a collision, strong vectors originate trying to change the path of the robot.
-
-An interesting structure occurs on the stage transition (figure \ref{fig:usarsim_transition}). Passing the transition seems to be save somewhere left from the center, where the probability of hitting the wall or the pole is small. Therefore all the (strong and positive rewarded) force vectors in front of the transition point in roughly the same direction, which may be interpret as a point on the optimal path. Although experiments with a lot more trials are only shown from the simple simulation (which could be accelerated), it is likely, but not guaranteed, to converge to a smooth vector field with better paths.
-
-Although the improvement was only shown statistically in the simulation with simple (inertia) physics, the similarity suggests that the results apply for the USARSim simulation too.
+The USARSim result seems to show similar initial results, suggesting that the physics in the simple simulation were reasonable except for the inertia strength. Although experiments with a lot more trials are only shown in both figures and statistically for the simple simulation (which could be accelerated), it is likely, but not guaranteed, to converge to a smooth vector field with better paths as happened in the simple simulation.
 
 
 
